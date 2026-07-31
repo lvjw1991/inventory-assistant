@@ -1,6 +1,5 @@
 package com.example.recover.repository;
 
-import com.example.recover.entity.Supplier;
 import com.example.recover.entity.SupplierProduct;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

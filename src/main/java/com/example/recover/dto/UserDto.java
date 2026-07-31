@@ -1,7 +1,6 @@
 package com.example.recover.dto;
 
 import com.example.recover.utils.UserRole;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
