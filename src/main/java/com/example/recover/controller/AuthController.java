@@ -2,7 +2,7 @@ package com.example.recover.controller;
 
 import com.example.recover.dto.LoginRequest;
 import com.example.recover.dto.RegisterRequest;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import com.example.recover.dto.UserDto;
 import com.example.recover.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;

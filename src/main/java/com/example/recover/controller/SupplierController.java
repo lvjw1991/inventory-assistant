@@ -1,7 +1,7 @@
 package com.example.recover.controller;
 
-import com.example.recover.dto.PageResponse;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.PageResponse;
+import com.example.recover.vo.Result;
 import com.example.recover.dto.SupplierRequest;
 import com.example.recover.entity.Supplier;
 import com.example.recover.service.SupplierService;

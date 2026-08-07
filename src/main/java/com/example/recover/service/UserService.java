@@ -6,7 +6,7 @@ import com.example.recover.dto.UserDto;
 import com.example.recover.entity.User;
 import com.example.recover.repository.UserRepository;
 import com.example.recover.exception.ResourceNotFoundException;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import com.example.recover.utils.JwtUtil;
 import com.example.recover.utils.UserMapper;
 import com.example.recover.utils.UserRole;
@@ -56,7 +56,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
         user.setPhone(registerRequest.getPhone());
         user.setRealName(registerRequest.getRealName());
-        user.setRole(UserRole.CASHIER);
+        user.setRole(UserRole.STAFF);
         user.setStatus(true);
         user.setUsername(username);
         user.setEnabled(true);

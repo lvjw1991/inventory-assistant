@@ -1,6 +1,6 @@
 package com.example.recover.config;
 
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import com.example.recover.utils.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

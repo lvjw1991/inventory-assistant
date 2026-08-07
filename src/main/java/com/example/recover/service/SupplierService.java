@@ -1,7 +1,7 @@
 package com.example.recover.service;
 
-import com.example.recover.dto.PageResponse;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.PageResponse;
+import com.example.recover.vo.Result;
 import com.example.recover.dto.SupplierRequest;
 import com.example.recover.entity.Supplier;
 import com.example.recover.exception.ResourceNotFoundException;
@@ -42,7 +42,7 @@ public class SupplierService {
         return Result.success(supplierRepository.save(supplier));
     }
 
-
+    @Transactional
     public Result<Boolean> delete(Long id) {
         Supplier supplier = findById(id).getData();
         supplierRepository.delete(supplier);

@@ -1,8 +1,8 @@
 package com.example.recover.controller;
 
-import com.example.recover.dto.PageResponse;
+import com.example.recover.vo.PageResponse;
 import com.example.recover.dto.ProductRequest;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.example.recover.dto;
+package com.example.recover.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

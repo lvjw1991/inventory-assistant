@@ -16,14 +16,17 @@ public class ReceivingOrderItem extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String receivingOrderId;
+    private Long receivingOrderId;
     private String supplierCode;
     private String productName;
     private String barcode;
     private Integer orderQty;
     private Integer actualQty;
+    private Integer total;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private String expiryDate;
     private BigDecimal unitPrice;
+    private String category;
+    private String sugar;
 
 }

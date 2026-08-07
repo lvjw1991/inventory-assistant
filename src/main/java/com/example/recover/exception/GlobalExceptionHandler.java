@@ -1,6 +1,6 @@
 package com.example.recover.exception;
 
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

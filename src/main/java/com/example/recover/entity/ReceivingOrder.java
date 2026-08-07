@@ -1,5 +1,6 @@
 package com.example.recover.entity;
 
+import com.example.recover.utils.OrderProcess;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -14,11 +15,12 @@ public class ReceivingOrder extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String orderNO;
-    private String supplierId;
-    private String invoiceNO;
+    private Long supplierId;
+    private String invoiceNo;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private String receiveDate;
     private String sourceFile;
+    @Enumerated(EnumType.STRING)
+    private OrderProcess progress;
 
 }

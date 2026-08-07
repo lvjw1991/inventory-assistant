@@ -1,8 +1,8 @@
 package com.example.recover.service;
 
-import com.example.recover.dto.PageResponse;
+import com.example.recover.vo.PageResponse;
 import com.example.recover.dto.ProductRequest;
-import com.example.recover.dto.Result;
+import com.example.recover.vo.Result;
 import com.example.recover.entity.Product;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ProductRepository;
@@ -55,7 +55,7 @@ public class ProductService {
         return Result.success(productRepository.save(product));
     }
 
-
+    @Transactional
     public Result<Boolean> delete(Long id) {
         Product product = findById(id).getData();
         productRepository.delete(product);
