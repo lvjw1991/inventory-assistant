@@ -12,6 +12,7 @@ public class OrderItemConverter {
             return null;
         }
         OrderItemVO orderItemVO = new OrderItemVO();
+        orderItemVO.setId(item.getId());
         orderItemVO.setSupplierCode(item.getSupplierCode());
         orderItemVO.setProductName(item.getProductName());
         orderItemVO.setBarcode(item.getBarcode());
@@ -22,7 +23,7 @@ public class OrderItemConverter {
         orderItemVO.setUnitPrice(item.getUnitPrice());
         orderItemVO.setCategory(item.getCategory());
         orderItemVO.setSugar(item.getSugar());
-        orderItemVO.setCheckStatus(item.getCheckStatus().name());
+        orderItemVO.setCheckStatus(item.getCheckStatus() != null ? item.getCheckStatus().name() : "");
         return orderItemVO;
     }
 }

@@ -45,9 +45,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITELIST).permitAll()
                         // 管理员才能注册新用户
-                        .requestMatchers("/auth/register").hasRole("ADMIN")
+                        .requestMatchers("/api/auth/register").hasRole("ADMIN")
                         // 放行登录注册接口
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         // 其余接口需要登录
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex

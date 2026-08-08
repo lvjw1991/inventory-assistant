@@ -3,7 +3,6 @@ package com.example.recover;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemCheckRequest;
-import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.vo.OrderItemVO;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,7 +31,7 @@ class OrderItemServiceTests {
     @Test
     void page() {
         Long orderId=5L;
-        Result<PageResponse<ReceivingOrderItem>> allByPage = service.findAllByPage(0, 10, orderId, CheckStatus.UNCHECKED);
+        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(0, 10, orderId, CheckStatus.UNCHECKED.name());
         System.out.println(JSON.toJSONString(allByPage));
         assertEquals("success", allByPage.getMessage());
 
@@ -67,10 +65,10 @@ class OrderItemServiceTests {
     void checkAll(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Long orderId=5L;
-        Result<PageResponse<ReceivingOrderItem>> allByPage = service.findAllByPage(0, 50, orderId, null);
-        List<ReceivingOrderItem> list = allByPage.getData().getList();
-        for (ReceivingOrderItem item : list){
-            if(item.getCheckStatus().equals(CheckStatus.UNCHECKED)) {
+        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(0, 50, orderId, null);
+        List<OrderItemVO> list = allByPage.getData().getList();
+        for (OrderItemVO item : list){
+            if(item.getCheckStatus().equals(CheckStatus.UNCHECKED.name())) {
                 // 简化的任意日期生成示例
                 int year = ThreadLocalRandom.current().nextInt(2027, 2031);
                 int month = ThreadLocalRandom.current().nextInt(1, 13);
@@ -84,23 +82,6 @@ class OrderItemServiceTests {
             }
         }
 
-    }
-
-    public static void main(String[] args) {
-        String path = "src/test/resources/test0807.xlsx";
-
-        List<OrderItemVO> list = new ArrayList<>();
-
-        OrderItemVO vo = new OrderItemVO();
-        vo.setProductName("测试商品");
-        vo.setSupplierCode("3005");
-        vo.setOrderQty(10);
-
-        list.add(vo);
-
-        EasyExcel.write(path, OrderItemVO.class)
-                .sheet("test")
-                .doWrite(list);
     }
 
 }

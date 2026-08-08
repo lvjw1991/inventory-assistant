@@ -1,9 +1,7 @@
 package com.example.recover.vo;
 
-import com.example.recover.utils.ProcessMethod;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -27,8 +25,8 @@ public class ExpiryRecordVO {
 
     private Boolean processStatus;
 
-    @Enumerated(EnumType.STRING)
-    private ProcessMethod processMethod;
+    @Schema(description = "处理方式", example = "NORMAL,PROMOTE,DAMAGE")
+    private String processMethod;
 
     private LocalDateTime processTime;
 

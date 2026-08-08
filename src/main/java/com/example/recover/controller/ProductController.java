@@ -45,8 +45,9 @@ public class ProductController {
     /**
      * 修改
      */
-    @PutMapping
-    public Result<Product> update(@Valid @RequestBody ProductRequest request) {
+    @PutMapping("/{id}")
+    public Result<Product> update(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        request.setId(id);
         return productService.update(request);
     }
 

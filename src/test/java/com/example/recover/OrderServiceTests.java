@@ -1,17 +1,22 @@
 package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemRow;
+import com.example.recover.dto.OrderQuery;
 import com.example.recover.dto.OrderRequest;
 import com.example.recover.entity.ReceivingOrder;
 import com.example.recover.service.OrderService;
 import com.example.recover.vo.ImportResultVO;
+import com.example.recover.vo.PageResponse;
+import com.example.recover.vo.ReceivingOrderVO;
 import com.example.recover.vo.Result;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,17 +40,17 @@ class OrderServiceTests {
     @Test
     void mainProcess() {
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setReceiveDate("2026-08-03");
+        orderRequest.setReceiveDate(LocalDate.now());
         orderRequest.setInvoiceNo("invoiceNO");
         orderRequest.setSupplierId(4L);
-        Result<ReceivingOrder> receivingOrderResult = orderService.create(orderRequest);
+        Result<ReceivingOrderVO> receivingOrderResult = orderService.create(orderRequest);
         assertEquals("success", receivingOrderResult.getMessage());
-        ReceivingOrder data = receivingOrderResult.getData();
+        ReceivingOrderVO data = receivingOrderResult.getData();
         Long orderId = data.getId();
         List<OrderItemRow> rows = readExcel("test.xlsx");
 
         ImportResultVO result = orderService.importOrderItems(rows, orderId);
-        ReceivingOrder order = orderService.updateProcess(data);
+        ReceivingOrder order = orderService.updateProcess(orderService.findEntityById(orderId));
 
         assertEquals(47, result.getSuccess());
         assertEquals(1, result.getSkip());
@@ -56,6 +61,17 @@ class OrderServiceTests {
     void complete(){
         Result<Boolean> complete = orderService.complete(5L);
         assertEquals("success", complete.getMessage());
+    }
+
+
+    @Test
+    void page() {
+        OrderQuery orderQuery = new OrderQuery();
+        orderQuery.setSupplierId(4L);
+        Result<PageResponse<ReceivingOrderVO>> allByPage = orderService.findAllByPage(orderQuery);
+        System.out.println(JSON.toJSONString(allByPage));
+        assertEquals("success", allByPage.getMessage());
+
     }
 
 }

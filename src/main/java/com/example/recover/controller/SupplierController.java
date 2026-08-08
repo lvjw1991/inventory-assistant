@@ -45,8 +45,9 @@ public class SupplierController {
     /**
      * 修改供应商
      */
-    @PutMapping
-    public Result<Supplier> update(@Valid @RequestBody SupplierRequest supplierRequest) {
+    @PutMapping("/{id}")
+    public Result<Supplier> update(@PathVariable Long id, @Valid @RequestBody SupplierRequest supplierRequest) {
+        supplierRequest.setId(id);
         return supplierService.update(supplierRequest);
     }
 

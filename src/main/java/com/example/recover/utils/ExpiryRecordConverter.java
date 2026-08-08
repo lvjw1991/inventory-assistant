@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExpiryRecordConverter {
 
-    public ExpiryRecordVO toVO(ExpiryRecord entity){
+    public ExpiryRecordVO toVO(ExpiryRecord entity) {
         ExpiryRecordVO vo = new ExpiryRecordVO();
         vo.setId(entity.getId());
         vo.setBarcode(entity.getBarcode());
@@ -17,11 +17,11 @@ public class ExpiryRecordConverter {
         vo.setConfirmTime(entity.getConfirmTime());
         vo.setProcessStatus(entity.getProcessStatus());
         vo.setProcessTime(entity.getProcessTime());
-        vo.setProcessMethod(entity.getProcessMethod());
+        vo.setProcessMethod(entity.getProcessMethod() != null ? entity.getProcessMethod().name() : "");
         vo.setProcessRemark(entity.getProcessRemark());
         vo.setCategory(entity.getCategory());
         vo.setProductName(entity.getProductName());
-        if(entity.getProduct()!=null){
+        if (entity.getProduct() != null) {
             vo.setImgUrl(entity.getProduct().getImgUrl());
         }
         return vo;

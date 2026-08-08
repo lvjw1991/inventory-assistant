@@ -4,6 +4,5 @@ public enum OrderProcess {
     DRAFT,
     READY,
     CHECKING,
-    COMPLETED,
-    CANCELLED
+    COMPLETED
 }

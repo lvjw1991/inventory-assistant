@@ -1,18 +1,23 @@
 package com.example.recover.controller;
 
+import com.example.recover.dto.OrderQuery;
 import com.example.recover.dto.OrderRequest;
 import com.example.recover.vo.ImportResultVO;
 import com.example.recover.vo.PageResponse;
+import com.example.recover.vo.ReceivingOrderVO;
 import com.example.recover.vo.Result;
-import com.example.recover.entity.ReceivingOrder;
 import com.example.recover.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Tag(name = "收货单管理")
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -23,18 +28,20 @@ public class OrderController {
     /**
      * 查询全部
      */
+    @Operation(
+            summary = "分页查询收货单",
+            description = "根据供应商ID、收货日期范围进行分页查询"
+    )
     @GetMapping
-    public Result<PageResponse<ReceivingOrder>> search(
-            @RequestParam(defaultValue = "0") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        return orderService.findAllByPage(pageNum, pageSize);
+    public Result<PageResponse<ReceivingOrderVO>> search(@ParameterObject OrderQuery orderQuery) {
+        return orderService.findAllByPage(orderQuery);
     }
 
     /**
      * 查询单个
      */
     @GetMapping("/{id}")
-    public Result<ReceivingOrder> getById(@PathVariable Long id) {
+    public Result<ReceivingOrderVO> getById(@PathVariable Long id) {
         return orderService.findById(id);
     }
 
@@ -42,15 +49,16 @@ public class OrderController {
      * 创建
      */
     @PostMapping
-    public Result<ReceivingOrder> create(@Valid @RequestBody OrderRequest request) {
+    public Result<ReceivingOrderVO> create(@Valid @RequestBody OrderRequest request) {
         return orderService.create(request);
     }
 
     /**
      * 修改
      */
-    @PutMapping
-    public Result<ReceivingOrder> update(@Valid @RequestBody OrderRequest request) {
+    @PutMapping("/{id}")
+    public Result<ReceivingOrderVO> update(@PathVariable Long id, @Valid @RequestBody OrderRequest request) {
+        request.setId(id);
         return orderService.update(request);
     }
 

@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "receiving_order")
 @Data
@@ -18,7 +20,7 @@ public class ReceivingOrder extends BaseEntity {
     private Long supplierId;
     private String invoiceNo;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private String receiveDate;
+    private LocalDate receiveDate;
     private String sourceFile;
     @Enumerated(EnumType.STRING)
     private OrderProcess progress;

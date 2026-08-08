@@ -13,7 +13,7 @@ public class RecordQuery {
     private Boolean isProcessed;
     private String category;          // 产品类型
     private String barcode;
-    private int page = 1;
-    private int size = 20;
+    private int pageNum = 0;
+    private int pageSize = 20;
 
 }

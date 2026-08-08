@@ -29,21 +29,28 @@ public class OrderItemService {
 
     private final OrderService orderService;
 
-    public Result<PageResponse<ReceivingOrderItem>> findAllByPage(int pageNum, int pageSize, Long orderId, CheckStatus checkStatus) {
+    public Result<PageResponse<OrderItemVO>> findAllByPage(int pageNum, int pageSize, Long orderId, String checkStatus) {
         ReceivingOrderItem orderItem = new ReceivingOrderItem();
         orderItem.setReceivingOrderId(orderId);
-        orderItem.setCheckStatus(checkStatus);
+        if(checkStatus!=null && !checkStatus.isEmpty()){
+            orderItem.setCheckStatus(CheckStatus.valueOf(checkStatus));
+        }
         Example<ReceivingOrderItem> example = Example.of(orderItem);
-        return Result.success(PageResponse.of(orderItemRepository.findAll(example, PageRequest.of(pageNum, pageSize))));
+        return Result.success(PageResponse.of(orderItemRepository.findAll(example, PageRequest.of(pageNum, pageSize))
+                .map(orderItemConverter::toVo)));
     }
 
-    public Result<ReceivingOrderItem> findById(Long id) {
+    public Result<OrderItemVO> findById(Long id) {
         ReceivingOrderItem orderItem = orderItemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(404, "ResourceNotFoundException"));
-        return Result.success(orderItem);
+        return Result.success(orderItemConverter.toVo(orderItem));
+    }
+
+    public ReceivingOrderItem findEntityById(Long id) {
+        return orderItemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(404, "ResourceNotFoundException"));
     }
 
     @Transactional
-    public Result<ReceivingOrderItem> create(OrderItemRequest request) {
+    public Result<OrderItemVO> create(OrderItemRequest request) {
         ReceivingOrderItem orderItem = new ReceivingOrderItem();
         orderItem.setReceivingOrderId(request.getReceivingOrderId());
         orderItem.setSupplierCode(request.getSupplierCode());
@@ -57,7 +64,7 @@ public class OrderItemService {
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getCheckStatus());
-        return Result.success(orderItemRepository.save(orderItem));
+        return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
     }
 
     private List<String> deduplicationList(List<String> expiryDate) {
@@ -68,8 +75,8 @@ public class OrderItemService {
     }
 
     @Transactional
-    public Result<ReceivingOrderItem> update(OrderItemRequest request) {
-        ReceivingOrderItem orderItem = findById(request.getId()).getData();
+    public Result<OrderItemVO> update(OrderItemRequest request) {
+        ReceivingOrderItem orderItem = findEntityById(request.getId());
         orderItem.setSupplierCode(request.getSupplierCode());
         orderItem.setProductName(request.getProductName());
         orderItem.setBarcode(request.getBarcode());
@@ -81,12 +88,12 @@ public class OrderItemService {
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getCheckStatus());
-        return Result.success(orderItemRepository.save(orderItem));
+        return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
     }
 
     @Transactional
     public Result<Boolean> delete(Long id) {
-        ReceivingOrderItem item = findById(id).getData();
+        ReceivingOrderItem item = findEntityById(id);
         orderItemRepository.delete(item);
         return Result.success(true);
     }
@@ -102,7 +109,7 @@ public class OrderItemService {
      */
     @Transactional
     public Result<Boolean> check(Long id, OrderItemCheckRequest request) {
-        ReceivingOrderItem orderItem = findById(id).getData();
+        ReceivingOrderItem orderItem = findEntityById(id);
         orderItem.setBarcode(request.getBarcode());
         orderItem.setActualQty(request.getActualQty());
         orderItem.setExpiryDate(Strings.join(deduplicationList(request.getExpiryDate()), ','));

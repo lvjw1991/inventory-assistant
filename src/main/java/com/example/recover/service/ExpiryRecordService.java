@@ -1,9 +1,6 @@
 package com.example.recover.service;
 
-import com.example.recover.dto.BarcodeStockRow;
-import com.example.recover.dto.ExpiryConfirmRequest;
-import com.example.recover.dto.ExpiryProcessRequest;
-import com.example.recover.dto.RecordQuery;
+import com.example.recover.dto.*;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ExpiryRecordRepository;
@@ -40,7 +37,7 @@ public class ExpiryRecordService {
 
     public Result<PageResponse<ExpiryRecordVO>> search(RecordQuery query) {
         Pageable pageable = PageRequest.of(
-                query.getPage() - 1, query.getSize(),
+                query.getPageNum(), query.getPageSize(),
                 Sort.by("expiryDate").ascending());
 
         return Result.success(PageResponse.of(expiryRecordRepository
@@ -146,21 +143,22 @@ public class ExpiryRecordService {
                 .collect(Collectors.toSet());
         List<ExpiryRecord> saveList = new ArrayList<>();
         for (ReceivingOrderItem item : orderItemList) {
-            if (item.getExpiryDate() == null
-                    || item.getBarcode() == null) {
+            String expiryDate = item.getExpiryDate();
+            String barcode = item.getBarcode();
+            if (expiryDate == null || expiryDate.isBlank()
+                    || barcode == null || barcode.isBlank()) {
                 continue;
             }
-            String expiryDate = item.getExpiryDate();
             String[] dateArray = expiryDate.split(",");
             for (String dateString : dateArray) {
                 LocalDate date = LocalDate.parse(dateString);
-                String key = item.getBarcode() + ":" + date;
+                String key = barcode + ":" + date;
                 // 数据库已有，跳过
                 if (existingKeys.contains(key)) {
                     continue;
                 }
                 ExpiryRecord expiryRecord = new ExpiryRecord();
-                expiryRecord.setBarcode(item.getBarcode());
+                expiryRecord.setBarcode(barcode);
                 expiryRecord.setExpiryDate(date);
                 expiryRecord.setCategory(item.getCategory());
                 expiryRecord.setConfirmStatus(false);
@@ -175,5 +173,39 @@ public class ExpiryRecordService {
             expiryRecordRepository.saveAll(saveList);
         }
 
+    }
+
+    @Transactional
+    public Result<ExpiryRecordVO> create(ExpiryRecordRequest request) {
+        String barcode = request.getBarcode();
+        LocalDate date = request.getExpiryDate();
+        boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
+        if (exist) {
+            return Result.fail(500, "barcode, date重复");
+        }
+        ExpiryRecord expiryRecord = new ExpiryRecord();
+        expiryRecord.setBarcode(barcode);
+        expiryRecord.setExpiryDate(date);
+        expiryRecord.setCategory(request.getCategory());
+        expiryRecord.setConfirmStatus(false);
+        expiryRecord.setProcessStatus(false);
+        expiryRecord.setProductName(request.getProductName());
+        return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
+    }
+
+    @Transactional
+    public Result<ExpiryRecordVO> update(ExpiryRecordRequest request) {
+        ExpiryRecord expiryRecord = findEntityById(request.getId());
+        String barcode = request.getBarcode();
+        LocalDate date = request.getExpiryDate();
+        boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
+        if (exist) {
+            return Result.fail(500, "barcode, date重复");
+        }
+        expiryRecord.setBarcode(barcode);
+        expiryRecord.setExpiryDate(date);
+        expiryRecord.setCategory(request.getCategory());
+        expiryRecord.setProductName(request.getProductName());
+        return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }
 }

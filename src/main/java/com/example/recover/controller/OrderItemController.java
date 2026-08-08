@@ -3,9 +3,7 @@ package com.example.recover.controller;
 import com.alibaba.excel.EasyExcel;
 import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemRequest;
-import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.service.OrderItemService;
-import com.example.recover.utils.CheckStatus;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -30,9 +28,9 @@ public class OrderItemController {
      * 查询全部
      */
     @GetMapping
-    public Result<PageResponse<ReceivingOrderItem>> search(
+    public Result<PageResponse<OrderItemVO>> search(
             @RequestParam("orderId") Long orderId,
-            @RequestParam(required = false) CheckStatus status,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
         return orderItemService.findAllByPage(pageNum, pageSize, orderId, status);
@@ -42,7 +40,7 @@ public class OrderItemController {
      * 查询单个
      */
     @GetMapping("/{id}")
-    public Result<ReceivingOrderItem> getById(@PathVariable Long id) {
+    public Result<OrderItemVO> getById(@PathVariable Long id) {
         return orderItemService.findById(id);
     }
 
@@ -50,7 +48,7 @@ public class OrderItemController {
      * 创建
      */
     @PostMapping
-    public Result<ReceivingOrderItem> create(@Valid @RequestBody OrderItemRequest request) {
+    public Result<OrderItemVO> create(@Valid @RequestBody OrderItemRequest request) {
         return orderItemService.create(request);
     }
 
@@ -58,7 +56,7 @@ public class OrderItemController {
      * 修改
      */
     @PutMapping("/{id}")
-    public Result<ReceivingOrderItem> update(@PathVariable Long id, @Valid @RequestBody OrderItemRequest request) {
+    public Result<OrderItemVO> update(@PathVariable Long id, @Valid @RequestBody OrderItemRequest request) {
         request.setId(id);
         return orderItemService.update(request);
     }

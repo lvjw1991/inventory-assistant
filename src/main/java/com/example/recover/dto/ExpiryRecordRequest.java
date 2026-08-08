@@ -1,21 +1,27 @@
 package com.example.recover.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
-public class OrderRequest {
+public class ExpiryRecordRequest {
 
     private Long id;
 
-    @NotNull
-    private Long supplierId;
-    private String invoiceNo;
+    @NotBlank
+    private String barcode;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate receiveDate;
+    @NotNull
+    private LocalDate expiryDate;
+
+    private String category;
+
+    private String productName;
 
 
 }
