@@ -36,7 +36,7 @@ class OrderServiceTests {
     void mainProcess() {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setReceiveDate("2026-08-03");
-        orderRequest.setInvoiceNo("invoiveNO");
+        orderRequest.setInvoiceNo("invoiceNO");
         orderRequest.setSupplierId(4L);
         Result<ReceivingOrder> receivingOrderResult = orderService.create(orderRequest);
         assertEquals("success", receivingOrderResult.getMessage());
@@ -50,6 +50,12 @@ class OrderServiceTests {
         assertEquals(47, result.getSuccess());
         assertEquals(1, result.getSkip());
         assertEquals("READY", order.getProgress().name());
+    }
+
+    @Test
+    void complete(){
+        Result<Boolean> complete = orderService.complete(5L);
+        assertEquals("success", complete.getMessage());
     }
 
 }

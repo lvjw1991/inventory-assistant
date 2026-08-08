@@ -1,5 +1,6 @@
 package com.example.recover.dto;
 
+import com.example.recover.utils.CheckStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class OrderItemCheckRequest {
     private String sugar;
 
     @NotNull(message = "status不能为空")
-    private Boolean status;
+    private CheckStatus status;
 
 
 }

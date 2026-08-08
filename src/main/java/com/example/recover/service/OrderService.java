@@ -4,6 +4,7 @@ import com.example.recover.dto.OrderItemRow;
 import com.example.recover.dto.OrderRequest;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.repository.ReceivingOrderItemRepository;
+import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.ExcelUtils;
 import com.example.recover.utils.OrderProcess;
 import com.example.recover.vo.ImportResultVO;
@@ -13,6 +14,7 @@ import com.example.recover.entity.ReceivingOrder;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +35,13 @@ public class OrderService {
 
     private final ReceivingOrderItemRepository orderItemRepository;
 
+    private final SupplierProductService supplierProductService;
+
+    private final ExpiryRecordService expiryRecordService;
+
 
     public Result<PageResponse<ReceivingOrder>> findAllByPage(int pageNum, int pageSize) {
-        return Result.success(PageResponse.of(orderRepository.findAll(PageRequest.of(pageNum,pageSize))));
+        return Result.success(PageResponse.of(orderRepository.findAll(PageRequest.of(pageNum, pageSize))));
     }
 
     public Result<ReceivingOrder> findById(Long id) {
@@ -96,6 +102,7 @@ public class OrderService {
             orderItem.setOrderQty(row.getOrderQty());
             orderItem.setTotal(row.getTotal());
             orderItem.setCategory(row.getCategory());
+            orderItem.setCheckStatus(CheckStatus.UNCHECKED);
             orderItemList.add(orderItem);
         }
         List<ReceivingOrderItem> uniqueList = orderItemList.stream()
@@ -109,4 +116,44 @@ public class OrderService {
         return new ImportResultVO(success, skip);
     }
 
+    /**
+     * 2. 保存 supplier_product（不存在则新增）
+     * 3. 保存 expiry_record（不存在则新增）
+     *
+     * @param id
+     * @return
+     */
+    public Result<Boolean> complete(Long id) {
+        ReceivingOrder order = findById(id).getData();
+        if (order.getProgress().equals(OrderProcess.READY)) {
+            return Result.fail(500, "请先点货");
+        }
+        if (order.getProgress().equals(OrderProcess.COMPLETED)) {
+            return Result.fail(500, "已完成点货");
+        }
+        ReceivingOrderItem orderItem = new ReceivingOrderItem();
+        orderItem.setReceivingOrderId(id);
+        Example<ReceivingOrderItem> example = Example.of(orderItem);
+        List<ReceivingOrderItem> orderItemList = orderItemRepository.findAll(example);
+        if (orderItemList.isEmpty()) {
+            return Result.fail(500, "请先导入货单");
+        }
+        List<CheckStatus> list = orderItemList.stream().map(ReceivingOrderItem::getCheckStatus).distinct().toList();
+        if (list.contains(CheckStatus.UNCHECKED)) {
+            return Result.fail(500, "请先点货");
+        }
+        supplierProductService.saveAll(orderItemList, order.getSupplierId());
+        expiryRecordService.saveAll(orderItemList);
+        order.setProgress(OrderProcess.COMPLETED);
+        orderRepository.save(order);
+        return Result.success(true);
+    }
+
+    public void updateProcess(Long receivingOrderId) {
+        ReceivingOrder order = findById(receivingOrderId).getData();
+        if (order.getProgress().equals(OrderProcess.READY)) {
+            order.setProgress(OrderProcess.CHECKING);
+            orderRepository.save(order);
+        }
+    }
 }

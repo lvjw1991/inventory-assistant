@@ -2,12 +2,11 @@ package com.example.recover.service;
 
 import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemRequest;
-import com.example.recover.dto.SupplierProductRequest;
-import com.example.recover.entity.ReceivingOrder;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderItemRepository;
-import com.example.recover.utils.OrderItemMapper;
+import com.example.recover.utils.CheckStatus;
+import com.example.recover.utils.OrderItemConverter;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -26,17 +25,14 @@ public class OrderItemService {
 
     private final ReceivingOrderItemRepository orderItemRepository;
 
-    private final SupplierProductService supplierProductService;
+    private final OrderItemConverter orderItemConverter;
 
     private final OrderService orderService;
 
-    private final ExpiryRecordService expiryRecordService;
-
-    private final OrderItemMapper orderItemMapper;
-
-    public Result<PageResponse<ReceivingOrderItem>> findAllByPage(int pageNum, int pageSize, Long orderId) {
+    public Result<PageResponse<ReceivingOrderItem>> findAllByPage(int pageNum, int pageSize, Long orderId, CheckStatus checkStatus) {
         ReceivingOrderItem orderItem = new ReceivingOrderItem();
         orderItem.setReceivingOrderId(orderId);
+        orderItem.setCheckStatus(checkStatus);
         Example<ReceivingOrderItem> example = Example.of(orderItem);
         return Result.success(PageResponse.of(orderItemRepository.findAll(example, PageRequest.of(pageNum, pageSize))));
     }
@@ -60,6 +56,7 @@ public class OrderItemService {
         orderItem.setUnitPrice(request.getUnitPrice());
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
+        orderItem.setCheckStatus(request.getCheckStatus());
         return Result.success(orderItemRepository.save(orderItem));
     }
 
@@ -83,6 +80,7 @@ public class OrderItemService {
         orderItem.setUnitPrice(request.getUnitPrice());
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
+        orderItem.setCheckStatus(request.getCheckStatus());
         return Result.success(orderItemRepository.save(orderItem));
     }
 
@@ -94,10 +92,9 @@ public class OrderItemService {
     }
 
     /**
-     *
+     * 0. 更新order状态
      * 1. 更新 receiving_order_item
-     * 2. 保存 supplier_product（不存在则新增）
-     * 3. 保存 expiry_record（不存在则新增）
+     *
      *
      * @param id
      * @param request
@@ -105,33 +102,21 @@ public class OrderItemService {
      */
     @Transactional
     public Result<Boolean> check(Long id, OrderItemCheckRequest request) {
-        ReceivingOrderItem orderItem = updateItem(id, request);
-        ReceivingOrder order = orderService.findById(orderItem.getReceivingOrderId()).getData();
-        Long supplierId = order.getSupplierId();
-        SupplierProductRequest supplierProductRequest = new SupplierProductRequest();
-        supplierProductRequest.setBarcode(orderItem.getBarcode());
-        supplierProductRequest.setSupplierCode(orderItem.getSupplierCode());
-        supplierProductRequest.setSupplierId(supplierId);
-        supplierProductService.save(supplierProductRequest);
-        expiryRecordService.save(orderItem);
-        return Result.success(true);
-    }
-
-    public ReceivingOrderItem updateItem(Long id, OrderItemCheckRequest request) {
         ReceivingOrderItem orderItem = findById(id).getData();
         orderItem.setBarcode(request.getBarcode());
         orderItem.setActualQty(request.getActualQty());
         orderItem.setExpiryDate(Strings.join(deduplicationList(request.getExpiryDate()), ','));
         orderItem.setSugar(request.getSugar());
-        orderItem.setStatus(request.getStatus());
-        return orderItemRepository.save(orderItem);
+        orderItem.setCheckStatus(request.getStatus());
+        orderItemRepository.save(orderItem);
+        orderService.updateProcess(orderItem.getReceivingOrderId());
+        return Result.success(true);
     }
 
     public List<OrderItemVO> findAllByOrderId(Long orderId) {
         ReceivingOrderItem orderItem = new ReceivingOrderItem();
         orderItem.setReceivingOrderId(orderId);
         Example<ReceivingOrderItem> example = Example.of(orderItem);
-        List<ReceivingOrderItem> list = orderItemRepository.findAll(example);
-        return orderItemMapper.toVOList(list);
+        return orderItemRepository.findAll(example).stream().map(orderItemConverter::toVo).toList();
     }
 }

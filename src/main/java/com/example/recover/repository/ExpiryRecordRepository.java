@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 
 @Repository
@@ -21,4 +22,6 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
 
     @EntityGraph(attributePaths = "product")
     Page<ExpiryRecord> findAll(Specification<ExpiryRecord> spec, @Nonnull Pageable pageable);
+
+    List<ExpiryRecord> findByBarcodeIn(List<String> barcodeList);
 }

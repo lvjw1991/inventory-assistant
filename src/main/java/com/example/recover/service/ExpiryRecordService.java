@@ -12,7 +12,6 @@ import com.example.recover.utils.ExcelUtils;
 import com.example.recover.utils.ExpiryRecordConverter;
 import com.example.recover.vo.*;
 import com.example.recover.entity.ExpiryRecord;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
@@ -25,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -122,7 +123,7 @@ public class ExpiryRecordService {
     }
 
     @Transactional
-    public Result<Boolean> process(@Valid ExpiryProcessRequest request) {
+    public Result<Boolean> process(ExpiryProcessRequest request) {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
         expiryRecord.setProcessStatus(true);
         expiryRecord.setProcessMethod(request.getProcessMethod());
@@ -132,4 +133,47 @@ public class ExpiryRecordService {
         return Result.success(true);
     }
 
+    /**
+     * batch
+     * @param orderItemList
+     */
+    @Transactional
+    public void saveAll(List<ReceivingOrderItem> orderItemList) {
+        List<String> barcodeList = orderItemList.stream().map(ReceivingOrderItem::getBarcode).distinct().toList();
+        List<ExpiryRecord> expiryRecordList = expiryRecordRepository.findByBarcodeIn(barcodeList);
+        Set<String> existingKeys = expiryRecordList.stream()
+                .map(p -> p.getBarcode() + ":" + p.getExpiryDate())
+                .collect(Collectors.toSet());
+        List<ExpiryRecord> saveList = new ArrayList<>();
+        for (ReceivingOrderItem item : orderItemList) {
+            if (item.getExpiryDate() == null
+                    || item.getBarcode() == null) {
+                continue;
+            }
+            String expiryDate = item.getExpiryDate();
+            String[] dateArray = expiryDate.split(",");
+            for (String dateString : dateArray) {
+                LocalDate date = LocalDate.parse(dateString);
+                String key = item.getBarcode() + ":" + date;
+                // 数据库已有，跳过
+                if (existingKeys.contains(key)) {
+                    continue;
+                }
+                ExpiryRecord expiryRecord = new ExpiryRecord();
+                expiryRecord.setBarcode(item.getBarcode());
+                expiryRecord.setExpiryDate(date);
+                expiryRecord.setCategory(item.getCategory());
+                expiryRecord.setConfirmStatus(false);
+                expiryRecord.setProcessStatus(false);
+                expiryRecord.setProductName(item.getProductName());
+                saveList.add(expiryRecord);
+                // 加入 Set，防止本次 Excel 自己重复
+                existingKeys.add(key);
+            }
+        }
+        if (!saveList.isEmpty()) {
+            expiryRecordRepository.saveAll(saveList);
+        }
+
+    }
 }

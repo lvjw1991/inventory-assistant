@@ -39,7 +39,7 @@ public class OrderItemVO {
     private String sugar;
 
     @ExcelProperty("isCorrect")
-    private Boolean status;
+    private String checkStatus;
 
 
 }

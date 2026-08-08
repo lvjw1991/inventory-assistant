@@ -63,9 +63,26 @@ public class OrderController {
     }
 
 
+    /**
+     * 货单导入
+     * @param file
+     * @param orderId
+     * @return
+     * @throws IOException
+     */
     @PostMapping("/import")
     public Result<ImportResultVO> importExcel(@RequestParam("file") MultipartFile file,
                                               @RequestParam("orderId") Long orderId) throws IOException {
         return orderService.importExcel(file, orderId);
+    }
+
+    /**
+     * 点货完成
+     * @param id orderId
+     * @return
+     */
+    @PostMapping("/{id}/complete")
+    public Result<Boolean> complete(@PathVariable Long id) {
+        return orderService.complete(id);
     }
 }

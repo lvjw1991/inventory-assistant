@@ -1,5 +1,8 @@
 package com.example.recover.dto;
 
+import com.example.recover.utils.CheckStatus;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -21,5 +24,7 @@ public class OrderItemRequest {
     private BigDecimal unitPrice;
     private String category;
     private String sugar;
+    @Enumerated(EnumType.STRING)
+    private CheckStatus checkStatus;
 
 }

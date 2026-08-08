@@ -5,6 +5,7 @@ import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.service.OrderItemService;
+import com.example.recover.utils.CheckStatus;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -31,9 +32,10 @@ public class OrderItemController {
     @GetMapping
     public Result<PageResponse<ReceivingOrderItem>> search(
             @RequestParam("orderId") Long orderId,
+            @RequestParam(required = false) CheckStatus status,
             @RequestParam(defaultValue = "0") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
-        return orderItemService.findAllByPage(pageNum, pageSize, orderId);
+        return orderItemService.findAllByPage(pageNum, pageSize, orderId, status);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.example.recover.service;
 
+import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -11,6 +12,11 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,4 +58,41 @@ public class SupplierProductService {
         SupplierProduct supplierProduct = supplierProductRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(404, "ResourceNotFoundException"));
         return Result.success(supplierProduct);
     }
+
+    /**
+     * 批量维护
+     * @param orderItemList
+     * @param supplierId
+     */
+    @Transactional
+    public void saveAll(List<ReceivingOrderItem> orderItemList, Long supplierId) {
+        List<String> supplierCodeList = orderItemList.stream().map(ReceivingOrderItem::getSupplierCode).distinct().toList();
+        List<SupplierProduct> supplierProductList = supplierProductRepository.findBySupplierIdAndSupplierCodeIn(supplierId, supplierCodeList);
+        Set<String> existingKeys = supplierProductList.stream()
+                .map(p -> p.getSupplierCode() + ":" + p.getBarcode())
+                .collect(Collectors.toSet());
+        List<SupplierProduct> saveList = new ArrayList<>();
+        for (ReceivingOrderItem item : orderItemList) {
+            if (item.getSupplierCode() == null
+                    || item.getBarcode() == null) {
+                continue;
+            }
+            String key = item.getSupplierCode() + ":" + item.getBarcode();
+            // 数据库已有，跳过
+            if (existingKeys.contains(key)) {
+                continue;
+            }
+            SupplierProduct supplierProduct = new SupplierProduct();
+            supplierProduct.setSupplierId(supplierId);
+            supplierProduct.setSupplierCode(item.getSupplierCode());
+            supplierProduct.setBarcode(item.getBarcode());
+            saveList.add(supplierProduct);
+            // 加入 Set，防止本次 Excel 自己重复
+            existingKeys.add(key);
+        }
+        if (!saveList.isEmpty()) {
+            supplierProductRepository.saveAll(saveList);
+        }
+    }
+
 }
