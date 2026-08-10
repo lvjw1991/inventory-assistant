@@ -1,6 +1,7 @@
 package com.example.recover.utils;
 
-public enum ProcessMethod {
+public enum ProcessStatus {
+    UNPROCESS,
     NORMAL,
     PROMOTE,
     DAMAGE

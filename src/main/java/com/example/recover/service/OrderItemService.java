@@ -113,6 +113,7 @@ public class OrderItemService {
         orderItem.setBarcode(request.getBarcode());
         orderItem.setActualQty(request.getActualQty());
         orderItem.setExpiryDate(Strings.join(deduplicationList(request.getExpiryDate()), ','));
+        orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getStatus());
         orderItemRepository.save(orderItem);

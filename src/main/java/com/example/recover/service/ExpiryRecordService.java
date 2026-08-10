@@ -4,9 +4,10 @@ import com.example.recover.dto.*;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ExpiryRecordRepository;
-import com.example.recover.repository.RecordSpec;
+import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ExcelUtils;
 import com.example.recover.utils.ExpiryRecordConverter;
+import com.example.recover.utils.ProcessStatus;
 import com.example.recover.vo.*;
 import com.example.recover.entity.ExpiryRecord;
 import lombok.RequiredArgsConstructor;
@@ -39,30 +40,9 @@ public class ExpiryRecordService {
         Pageable pageable = PageRequest.of(
                 query.getPageNum(), query.getPageSize(),
                 Sort.by("expiryDate").ascending());
-
-        return Result.success(PageResponse.of(expiryRecordRepository
-                .findAll(RecordSpec.build(query), pageable).map(expiryRecordConverter::toVO)));
-    }
-
-    @Transactional
-    public void save(ReceivingOrderItem orderItem) {
-        String barcode = orderItem.getBarcode();
-        String expiryDate = orderItem.getExpiryDate();
-        String[] dateArray = expiryDate.split(",");
-        for (String dateString : dateArray) {
-            LocalDate date = LocalDate.parse(dateString);
-            boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
-            if (!exist) {
-                ExpiryRecord expiryRecord = new ExpiryRecord();
-                expiryRecord.setBarcode(barcode);
-                expiryRecord.setExpiryDate(date);
-                expiryRecord.setCategory(orderItem.getCategory());
-                expiryRecord.setConfirmStatus(false);
-                expiryRecord.setProcessStatus(false);
-                expiryRecord.setProductName(orderItem.getProductName());
-                expiryRecordRepository.save(expiryRecord);
-            }
-        }
+        return Result.success(PageResponse.of(expiryRecordRepository.findPage(query.getExpireDateFrom(),
+                query.getExpireDateTo(), query.getConfirmStatus(), query.getProcessStatus(),
+                query.getCategory(), query.getBarcode(), pageable)));
     }
 
     @Transactional
@@ -79,17 +59,19 @@ public class ExpiryRecordService {
                 ));
         int success = 0, skip = 0;
         ExpiryRecord expiryRecord = new ExpiryRecord();
-        expiryRecord.setProcessStatus(false);
+        expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
         List<ExpiryRecord> list = expiryRecordRepository.findAll(Example.of(expiryRecord));
+        List<ExpiryRecord> updateList = new ArrayList<>();
         for (ExpiryRecord record : list) {
             if (stockMap.containsKey(record.getBarcode())) {
                 record.setStock(stockMap.get(record.getBarcode()));
+                updateList.add(record);
                 success++;
             } else {
                 skip++;
             }
         }
-        expiryRecordRepository.saveAll(list);
+        expiryRecordRepository.saveAll(updateList);
         return new ImportResultVO(success, skip);
     }
 
@@ -108,7 +90,7 @@ public class ExpiryRecordService {
     @Transactional
     public Result<Boolean> confirm(ExpiryConfirmRequest request) {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
-        expiryRecord.setConfirmStatus(true);
+        expiryRecord.setConfirmStatus(request.getConfirmStatus());
         expiryRecord.setStock(request.getStock());
         expiryRecord.setConfirmTime(LocalDateTime.now());
         expiryRecordRepository.save(expiryRecord);
@@ -122,8 +104,10 @@ public class ExpiryRecordService {
     @Transactional
     public Result<Boolean> process(ExpiryProcessRequest request) {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
-        expiryRecord.setProcessStatus(true);
-        expiryRecord.setProcessMethod(request.getProcessMethod());
+        if(ConfirmStatus.UNCONFIRM.equals(expiryRecord.getConfirmStatus())){
+            return Result.fail(500, "商品尚未确认，不能进行处理");
+        }
+        expiryRecord.setProcessStatus(request.getProcessStatus());
         expiryRecord.setProcessRemark(request.getProcessRemark());
         expiryRecord.setProcessTime(LocalDateTime.now());
         expiryRecordRepository.save(expiryRecord);
@@ -161,8 +145,8 @@ public class ExpiryRecordService {
                 expiryRecord.setBarcode(barcode);
                 expiryRecord.setExpiryDate(date);
                 expiryRecord.setCategory(item.getCategory());
-                expiryRecord.setConfirmStatus(false);
-                expiryRecord.setProcessStatus(false);
+                expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
+                expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
                 expiryRecord.setProductName(item.getProductName());
                 saveList.add(expiryRecord);
                 // 加入 Set，防止本次 Excel 自己重复
@@ -187,8 +171,8 @@ public class ExpiryRecordService {
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        expiryRecord.setConfirmStatus(false);
-        expiryRecord.setProcessStatus(false);
+        expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
+        expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
         expiryRecord.setProductName(request.getProductName());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }

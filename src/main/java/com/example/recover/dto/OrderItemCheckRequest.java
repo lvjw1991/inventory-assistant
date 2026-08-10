@@ -14,6 +14,10 @@ public class OrderItemCheckRequest {
     private String barcode;
     private Integer actualQty;
     private List<String> expiryDate;
+
+    @NotBlank(message = "category不能为空")
+    private String category;
+
     private String sugar;
 
     @NotNull(message = "status不能为空")

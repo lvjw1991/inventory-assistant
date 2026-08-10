@@ -1,12 +1,11 @@
 package com.example.recover.entity;
 
-import com.example.recover.utils.ProcessMethod;
+import com.example.recover.utils.ConfirmStatus;
+import com.example.recover.utils.ProcessStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,22 +24,15 @@ public class ExpiryRecord extends BaseEntity {
     private LocalDate expiryDate;
     private Integer stock;
 
-    private Boolean confirmStatus;
+    @Enumerated(EnumType.STRING)
+    private ConfirmStatus confirmStatus;
     private LocalDateTime confirmTime;
 
-    private Boolean processStatus;
-
     @Enumerated(EnumType.STRING)
-    private ProcessMethod processMethod;
+    private ProcessStatus processStatus;
     private LocalDateTime processTime;
     private String processRemark;
     private String category;
     private String productName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "barcode", referencedColumnName = "barcode",
-            insertable = false, updatable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    @NotFound(action = NotFoundAction.IGNORE)
-    private Product product;
 
 }

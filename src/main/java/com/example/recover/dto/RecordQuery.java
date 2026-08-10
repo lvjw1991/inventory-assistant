@@ -1,5 +1,7 @@
 package com.example.recover.dto;
 
+import com.example.recover.utils.ConfirmStatus;
+import com.example.recover.utils.ProcessStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -9,8 +11,8 @@ public class RecordQuery {
 
     private LocalDate expireDateFrom;
     private LocalDate expireDateTo;
-    private Boolean isConfirmed;      // 0未确认 1已确认 null=全部
-    private Boolean isProcessed;
+    private ConfirmStatus confirmStatus;      // 0未确认 1已确认 null=全部
+    private ProcessStatus processStatus;
     private String category;          // 产品类型
     private String barcode;
     private int pageNum = 0;

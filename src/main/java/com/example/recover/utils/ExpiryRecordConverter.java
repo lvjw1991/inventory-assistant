@@ -17,13 +17,9 @@ public class ExpiryRecordConverter {
         vo.setConfirmTime(entity.getConfirmTime());
         vo.setProcessStatus(entity.getProcessStatus());
         vo.setProcessTime(entity.getProcessTime());
-        vo.setProcessMethod(entity.getProcessMethod() != null ? entity.getProcessMethod().name() : "");
         vo.setProcessRemark(entity.getProcessRemark());
         vo.setCategory(entity.getCategory());
         vo.setProductName(entity.getProductName());
-        if (entity.getProduct() != null) {
-            vo.setImgUrl(entity.getProduct().getImgUrl());
-        }
         return vo;
     }
 }
