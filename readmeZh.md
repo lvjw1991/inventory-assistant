@@ -2,6 +2,7 @@
 ## 第1周：项目基础 + 主数据
 ## 第2周：核心业务
 ## 第3周：库存 + 临期 + 企业级
+## 第4周：接口联调和AI前端
 
 一个面向零售门店的商品有效期管理系统，用于补充现有 POS 系统无法维护商品有效期的问题。
 
@@ -272,7 +273,7 @@ UNIQUE (
 
 ## 5. API
 
-系统采用 RESTful API。
+系统采用 RESTful API。swagger-ui/index.html
 
 ### Authentication
 
