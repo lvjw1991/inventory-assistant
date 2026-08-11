@@ -58,10 +58,10 @@ Excel 转换
                     │     Browser      │
                     │                  │
                     │ PC 管理后台       │
-                    │ 手机点货页面      │
+                    │ 手机点货,临时处理  │
                     └────────┬─────────┘
                              │ HTTP / REST
-                             ↓
+                             ↓ 
                     ┌──────────────────┐
                     │   Spring Boot    │
                     │     REST API     │
@@ -94,8 +94,9 @@ Excel 转换
 * 临期商品查询
 * 有效期处理
 * 库存数据导入
+* 点货流程
 
-### 手机端
+### 手机端 //todo
 
 通过浏览器访问，不需要安装 App。
 
@@ -124,7 +125,7 @@ Excel 转换
 * MySQL
 * Maven
 
-### Frontend  //todo
+### Frontend
 
 * Vue 3
 * TypeScript
@@ -157,8 +158,6 @@ Excel 转换
 supplier
 ├── id
 ├── name
-├── contact
-├── phone
 └── ...
 ```
 
@@ -236,7 +235,7 @@ receiving_order_item
 
 点货期间可以反复修改 Barcode 和有效期。
 
-完成点货后，再统一生成正式有效期数据。
+完成点货后，再统一生成正式有效期数据和code映射关系。
 
 ### Expiry Record
 
@@ -324,7 +323,7 @@ GET /api/receiving-orders/{id}/items
 PUT /api/receiving-orders/items/{id}/check
 ```
 
-手机端通过该接口完成：
+电脑/手机端通过该接口完成：
 
 ```text
 Barcode
@@ -362,7 +361,7 @@ PUT /api/expiry-records/{id}
 
 ---
 
-## 6. Docker
+## 6. Docker  //fixme
 
 系统使用 Docker 进行部署。
 
@@ -405,27 +404,30 @@ docker compose down
 
 ### PC 管理后台
 
-#### Dashboard
+#### Dashboard //todo
 
 > TODO: 添加 Dashboard 截图
 
 #### 来货单管理
 
-> TODO: 添加 Receiving Order 截图
+<img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/96d739ff-999a-4aee-ae4d-9908504d879c" />
+
 
 #### 来货单详情
 
-> TODO: 添加 Receiving Order Detail 截图
+<img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/5bb77c57-53a0-403a-a98d-98cf4461d647" />
+
+#### 点货列表
+
+<img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/77f78855-8369-499f-8cb7-65fa4698b154" />
+
 
 #### 有效期管理
 
-> TODO: 添加 Expiry Management 截图
+<img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/c6050cad-7af3-4ded-a8b3-89bb5b37743f" />
 
-#### 临期商品
 
-> TODO: 添加 Near Expiry 截图
-
-### 手机点货
+### 手机点货 //todo
 
 #### 点货列表
 
@@ -455,7 +457,7 @@ docker compose down
 * [x] 商品 Barcode 管理
 * [x] Supplier Code → Barcode 映射
 * [x] 来货单 Excel 导入
-* [x] 手机点货
+//todo 手机点货
 * [x] Barcode 录入
 * [x] 有效期录入
 * [x] 点货结果修改
