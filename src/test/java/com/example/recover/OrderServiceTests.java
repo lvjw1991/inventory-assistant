@@ -41,8 +41,10 @@ class OrderServiceTests {
     void mainProcess() {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setReceiveDate(LocalDate.now());
-        orderRequest.setInvoiceNo("invoiceNO");
+        orderRequest.setNumber(1);
         orderRequest.setSupplierId(4L);
+        orderRequest.setTransport("transport");
+        orderRequest.setTemperature("temperature");
         Result<ReceivingOrderVO> receivingOrderResult = orderService.create(orderRequest);
         assertEquals("success", receivingOrderResult.getMessage());
         ReceivingOrderVO data = receivingOrderResult.getData();

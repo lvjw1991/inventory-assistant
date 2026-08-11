@@ -1,22 +1,27 @@
 package com.example.recover.service;
 
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderItemRepository;
-import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.OrderItemConverter;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,15 +34,59 @@ public class OrderItemService {
 
     private final OrderService orderService;
 
-    public Result<PageResponse<OrderItemVO>> findAllByPage(int pageNum, int pageSize, Long orderId, String checkStatus) {
-        ReceivingOrderItem orderItem = new ReceivingOrderItem();
-        orderItem.setReceivingOrderId(orderId);
-        if(checkStatus!=null && !checkStatus.isEmpty()){
-            orderItem.setCheckStatus(CheckStatus.valueOf(checkStatus));
-        }
-        Example<ReceivingOrderItem> example = Example.of(orderItem);
-        return Result.success(PageResponse.of(orderItemRepository.findAll(example, PageRequest.of(pageNum, pageSize))
-                .map(orderItemConverter::toVo)));
+    public Result<PageResponse<OrderItemVO>> findAllByPage(OrderItemQuery itemQuery) {
+        Specification<ReceivingOrderItem> spec = (root, query, cb) -> {
+
+            List<Predicate> predicates = new ArrayList<>();
+
+            predicates.add(
+                    cb.equal(
+                            root.get("receivingOrderId"),
+                            itemQuery.getOrderId()
+                    )
+            );
+
+            // supplierCode 模糊查询
+            if (itemQuery.getSupplierCode() != null && !itemQuery.getSupplierCode().isBlank()) {
+                predicates.add(
+                        cb.like(
+                                root.get("supplierCode"),
+                                itemQuery.getSupplierCode().trim() + "%"
+                        )
+                );
+            }
+
+            // 确认状态
+            if (itemQuery.getCheckStatus() != null) {
+                predicates.add(
+                        cb.equal(
+                                root.get("checkStatus"),
+                                itemQuery.getCheckStatus()
+                        )
+                );
+            }
+
+            // 产品
+            if (itemQuery.getProductName() != null && !itemQuery.getProductName().isBlank()) {
+                predicates.add(
+                        cb.like(
+                                root.get("productName"),
+                                "%" + itemQuery.getProductName().trim() + "%"
+                        )
+                );
+            }
+
+            return cb.and(
+                    predicates.toArray(new Predicate[0])
+            );
+        };
+        Pageable pageable = PageRequest.of(itemQuery.getPageNum(), itemQuery.getPageSize(),
+                Sort.by(
+                        Sort.Direction.ASC,
+                        "supplierCode"
+                )
+        );
+        return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(orderItemConverter::toVo)));
     }
 
     public Result<OrderItemVO> findById(Long id) {
@@ -101,7 +150,6 @@ public class OrderItemService {
     /**
      * 0. 更新order状态
      * 1. 更新 receiving_order_item
-     *
      *
      * @param id
      * @param request

@@ -3,6 +3,8 @@ package com.example.recover;
 import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.*;
 import com.example.recover.entity.Supplier;
+import com.example.recover.entity.SupplierProduct;
+import com.example.recover.service.SupplierProductService;
 import com.example.recover.service.SupplierService;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -21,6 +23,9 @@ public class SupplierServiceTest {
 
     @Autowired
     private SupplierService supplierService;
+
+    @Autowired
+    private SupplierProductService service;
 
     @Test
     void add() {
@@ -59,5 +64,23 @@ public class SupplierServiceTest {
     void find() {
         Result<PageResponse<Supplier>> allByPage = supplierService.findAllByPage(0, 10);
         System.out.println(JSON.toJSONString(allByPage));
+        List<Supplier> list = allByPage.getData().getList();
+        if (list != null) {
+            Supplier first = list.getFirst();
+            Result<Supplier> byId = supplierService.findById(first.getId());
+            assertEquals(200, byId.getCode());
+        }
+    }
+
+    @Test
+    void find2() {
+        Result<PageResponse<SupplierProduct>> allByPage = service.findAllByPage(0, 10, null);
+        System.out.println(JSON.toJSONString(allByPage));
+        List<SupplierProduct> list = allByPage.getData().getList();
+        if (list != null) {
+            SupplierProduct first = list.getFirst();
+            Result<SupplierProduct> byId = service.findById(first.getId());
+            assertEquals(200, byId.getCode());
+        }
     }
 }

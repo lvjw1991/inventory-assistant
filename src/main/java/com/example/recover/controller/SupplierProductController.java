@@ -19,7 +19,7 @@ public class SupplierProductController {
      */
     @GetMapping
     public Result<PageResponse<SupplierProduct>> search(
-            @RequestParam("supplierId") Long supplierId,
+            @RequestParam(required = false) Long supplierId,
             @RequestParam(defaultValue = "0") int pageNum,
             @RequestParam(defaultValue = "10") int pageSize) {
         return supplierProductService.findAllByPage(pageNum, pageSize, supplierId);

@@ -11,9 +11,11 @@ public class OrderConverter {
         ReceivingOrderVO vo = new ReceivingOrderVO();
         vo.setId(entity.getId());
         vo.setSupplierId(entity.getSupplierId());
-        vo.setInvoiceNo(entity.getInvoiceNo());
+        vo.setNumber(entity.getNumber());
         vo.setReceiveDate(entity.getReceiveDate());
         vo.setProgress(entity.getProgress());
+        vo.setTemperature(entity.getTemperature());
+        vo.setTransport(entity.getTransport());
         return vo;
     }
 }

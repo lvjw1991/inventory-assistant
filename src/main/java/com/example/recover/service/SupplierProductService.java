@@ -10,6 +10,8 @@ import com.example.recover.repository.SupplierProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +52,12 @@ public class SupplierProductService {
         SupplierProduct supplierProduct = new SupplierProduct();
         supplierProduct.setSupplierId(supplierId);
         Example<SupplierProduct> example = Example.of(supplierProduct);
-        return Result.success(PageResponse.of(supplierProductRepository.findAll(example, PageRequest.of(pageNum,pageSize))));
+        Pageable pageable = PageRequest.of(
+                pageNum,
+                pageSize,
+                Sort.by(Sort.Direction.ASC, "supplierCode")
+        );
+        return Result.success(PageResponse.of(supplierProductRepository.findAll(example, pageable)));
     }
 
 

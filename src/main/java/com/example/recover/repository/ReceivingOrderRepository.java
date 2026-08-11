@@ -19,9 +19,11 @@ public interface ReceivingOrderRepository extends JpaRepository<ReceivingOrder, 
     SELECT new com.example.recover.vo.ReceivingOrderVO(
         r.id,
         r.supplierId,
-        r.invoiceNo,
+        r.number,
         r.receiveDate,
         r.progress,
+        r.temperature,
+        r.transport,
         s.supplierName
     )
     FROM ReceivingOrder r

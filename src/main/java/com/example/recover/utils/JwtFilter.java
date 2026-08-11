@@ -22,7 +22,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,8 +30,8 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("JwtFilter 收到请求: {}", request.getRequestURI());
         String token = resolveToken(request);
         log.info("Token: {}", token);
-        // ✅ Token 有就解析写入 SecurityContext
-        // ✅ Token 没有就直接放行，交给 Security 授权规则处理
+        //Token 有就解析写入 SecurityContext
+        //Token 没有就直接放行，交给 Security 授权规则处理
         if (token != null && jwtUtil.validateToken(token)) {
             String username = jwtUtil.getUsername(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -41,7 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
                             userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        // ✅ 无论有没有 Token 都继续，不在这里返回 401
+        //无论有没有 Token 都继续，不在这里返回 401
         chain.doFilter(request, response);
     }
 

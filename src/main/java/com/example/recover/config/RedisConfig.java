@@ -24,12 +24,12 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // ✅ Key 用 String 序列化
+        //Key 用 String 序列化
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
 
-        // ✅ Value 用 JSON 序列化
+        //Value 用 JSON 序列化
         RedisSerializer<Object> jsonSerializer = jsonSerializer();
         template.setValueSerializer(jsonSerializer);
         template.setHashValueSerializer(jsonSerializer);
@@ -48,7 +48,7 @@ public class RedisConfig {
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY);
 
-        return new RedisSerializer<Object>() {
+        return new RedisSerializer<>() {
             @Override
             public byte[] serialize(Object value) throws SerializationException {
                 if (value == null) return new byte[0];

@@ -3,6 +3,7 @@ package com.example.recover;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.vo.OrderItemVO;
@@ -31,7 +32,12 @@ class OrderItemServiceTests {
     @Test
     void page() {
         Long orderId=5L;
-        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(0, 10, orderId, CheckStatus.UNCHECKED.name());
+        OrderItemQuery orderItemQuery = new OrderItemQuery();
+        orderItemQuery.setOrderId(orderId);
+        orderItemQuery.setCheckStatus(CheckStatus.PASS);
+        orderItemQuery.setProductName("Kimchi");
+        orderItemQuery.setSupplierCode("3");
+        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(orderItemQuery);
         System.out.println(JSON.toJSONString(allByPage));
         assertEquals("success", allByPage.getMessage());
 
@@ -65,7 +71,9 @@ class OrderItemServiceTests {
     void checkAll(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         Long orderId=5L;
-        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(0, 50, orderId, null);
+        OrderItemQuery orderItemQuery = new OrderItemQuery();
+        orderItemQuery.setOrderId(orderId);
+        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(orderItemQuery);
         List<OrderItemVO> list = allByPage.getData().getList();
         for (OrderItemVO item : list){
             if(item.getCheckStatus().equals(CheckStatus.UNCHECKED.name())) {

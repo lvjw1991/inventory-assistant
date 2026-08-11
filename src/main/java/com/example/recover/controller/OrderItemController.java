@@ -2,6 +2,7 @@ package com.example.recover.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.vo.OrderItemVO;
@@ -28,12 +29,8 @@ public class OrderItemController {
      * 查询全部
      */
     @GetMapping
-    public Result<PageResponse<OrderItemVO>> search(
-            @RequestParam("orderId") Long orderId,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "0") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize) {
-        return orderItemService.findAllByPage(pageNum, pageSize, orderId, status);
+    public Result<PageResponse<OrderItemVO>> search(OrderItemQuery query) {
+        return orderItemService.findAllByPage(query);
     }
 
     /**

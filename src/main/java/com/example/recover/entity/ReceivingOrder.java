@@ -18,10 +18,11 @@ public class ReceivingOrder extends BaseEntity {
     private Long id;
 
     private Long supplierId;
-    private String invoiceNo;
+    private Integer number;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate receiveDate;
-    private String sourceFile;
+    private String temperature;
+    private String transport;
     @Enumerated(EnumType.STRING)
     private OrderProcess progress;
 

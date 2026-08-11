@@ -74,9 +74,11 @@ public class OrderService {
     public Result<ReceivingOrderVO> create(OrderRequest request) {
         ReceivingOrder order = new ReceivingOrder();
         order.setSupplierId(request.getSupplierId());
-        order.setInvoiceNo(request.getInvoiceNo());
+        order.setNumber(request.getNumber());
         order.setReceiveDate(request.getReceiveDate());
         order.setProgress(OrderProcess.DRAFT);
+        order.setTemperature(request.getTemperature());
+        order.setTransport(request.getTransport());
         return Result.success(orderConverter.toVO(orderRepository.save(order)));
     }
 
@@ -84,8 +86,10 @@ public class OrderService {
     public Result<ReceivingOrderVO> update(OrderRequest request) {
         ReceivingOrder order = findEntityById(request.getId());
         order.setSupplierId(request.getSupplierId());
-        order.setInvoiceNo(request.getInvoiceNo());
+        order.setNumber(request.getNumber());
         order.setReceiveDate(request.getReceiveDate());
+        order.setTemperature(request.getTemperature());
+        order.setTransport(request.getTransport());
         return Result.success(orderConverter.toVO(orderRepository.save(order)));
     }
 

@@ -21,8 +21,8 @@ public class ReceivingOrderVO {
     @Schema(description = "供应商ID", example = "4")
     private Long supplierId;
 
-    @Schema(description = "invoiceNo", example = "invoiceNo")
-    private String invoiceNo;
+    @Schema(description = "number", example = "1")
+    private Integer number;
 
     @Schema(description = "收货日期", example = "2026-08-08")
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -30,6 +30,12 @@ public class ReceivingOrderVO {
 
     @Schema(description = "货单状态", example = "DRAFT,READY,CHECKING,COMPLETED")
     private OrderProcess progress;
+
+    @Schema(description = "温度", example = "-18")
+    private String temperature;
+
+    @Schema(description = "运输公司", example = "flower truck")
+    private String transport;
 
     @Schema(description = "供应商名称", example = "K-FOOD")
     private String supplierName;
