@@ -1,8 +1,8 @@
 package com.example.recover.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -14,11 +14,11 @@ public class OrderQuery {
     private Long supplierId;
 
     @Schema(description = "开始日期", example = "2026-08-01")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
 
     @Schema(description = "结束日期", example = "2026-08-08")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
     @Schema(description = "页码，从0开始", example = "0")

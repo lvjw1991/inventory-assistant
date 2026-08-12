@@ -2,10 +2,7 @@ package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
-import com.example.recover.dto.BarcodeStockRow;
-import com.example.recover.dto.ExpiryConfirmRequest;
-import com.example.recover.dto.ExpiryProcessRequest;
-import com.example.recover.dto.RecordQuery;
+import com.example.recover.dto.*;
 import com.example.recover.service.ExpiryRecordService;
 import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ProcessStatus;
@@ -87,6 +84,19 @@ class ExpiryRecordTests {
         recordQuery.setExpireDateFrom(LocalDate.of(2026, 9, 1));
         recordQuery.setExpireDateTo(LocalDate.of(2026, 9, 30));
         Result<PageResponse<ExpiryRecordVO>> search = service.search(recordQuery);
+        System.out.println(JSON.toJSONString(search));
+        assertEquals("success", search.getMessage());
+    }
+
+    @Test
+    void searchMonthly() {
+        RecordMonthlyQuery recordQuery = new RecordMonthlyQuery();
+        recordQuery.setConfirmStatus(ConfirmStatus.UNCONFIRM);
+        recordQuery.setCategory("Fresh");
+        recordQuery.setProcessStatus(ProcessStatus.UNPROCESS);
+        recordQuery.setExpireDateFrom(LocalDate.of(2026, 9, 1));
+        recordQuery.setExpireDateTo(LocalDate.of(2026, 9, 30));
+        Result<List<ExpiryRecordVO>> search = service.searchMonthly(recordQuery);
         System.out.println(JSON.toJSONString(search));
         assertEquals("success", search.getMessage());
     }

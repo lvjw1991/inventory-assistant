@@ -1,9 +1,6 @@
 package com.example.recover.controller;
 
-import com.example.recover.dto.ExpiryConfirmRequest;
-import com.example.recover.dto.ExpiryProcessRequest;
-import com.example.recover.dto.ExpiryRecordRequest;
-import com.example.recover.dto.RecordQuery;
+import com.example.recover.dto.*;
 import com.example.recover.service.ExpiryRecordService;
 import com.example.recover.vo.ExpiryRecordVO;
 import com.example.recover.vo.ImportResultVO;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/records")
@@ -99,5 +97,15 @@ public class ExpiryRecordController {
         return expiryRecordService.process(request);
     }
 
+
+    /**
+     * 查每月
+     * @param query
+     * @return
+     */
+    @GetMapping("/calendar")
+    public Result<List<ExpiryRecordVO>> searchMonthly(@Valid RecordMonthlyQuery query) {
+        return expiryRecordService.searchMonthly(query);
+    }
 
 }

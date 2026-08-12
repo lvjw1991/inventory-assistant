@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -191,5 +192,16 @@ public class ExpiryRecordService {
         expiryRecord.setCategory(request.getCategory());
         expiryRecord.setProductName(request.getProductName());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
+    }
+
+    public Result<List<ExpiryRecordVO>> searchMonthly(RecordMonthlyQuery query) {
+        LocalDate expireDateFrom = query.getExpireDateFrom();
+        LocalDate expireDateTo = query.getExpireDateTo();
+        if(ChronoUnit.DAYS.between(expireDateFrom, expireDateTo) > 60){
+            return Result.fail(500, "请用分页接口");
+        }
+        return Result.success(expiryRecordRepository.findMonthly(query.getExpireDateFrom(),
+                query.getExpireDateTo(), query.getConfirmStatus(), query.getProcessStatus(),
+                query.getCategory()));
     }
 }

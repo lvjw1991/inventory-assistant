@@ -56,4 +56,35 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
             @Param("category") String category,
             @Param("barcode") String barcode,
             Pageable pageable);
+
+    @Query("""
+    SELECT new com.example.recover.vo.ExpiryRecordVO(
+        e.id,
+        e.barcode,
+        e.expiryDate,
+        e.stock,
+        e.confirmStatus,
+        e.confirmTime,
+        e.processStatus,
+        e.processTime,
+        e.processRemark,
+        e.category,
+        e.productName,
+        p.imgUrl
+    )
+    FROM ExpiryRecord e
+    LEFT JOIN Product p
+        ON p.barcode = e.barcode
+    WHERE  (:category IS NULL OR e.category = :category)
+      AND (:confirmStatus IS NULL OR e.confirmStatus = :confirmStatus)
+      AND (:processStatus IS NULL OR e.processStatus = :processStatus)
+      AND (:expireDateFrom IS NULL OR e.expiryDate >= :expireDateFrom)
+      AND (:expireDateTo IS NULL OR e.expiryDate <= :expireDateTo)
+""")
+    List<ExpiryRecordVO> findMonthly(
+            @Param("expireDateFrom") LocalDate expireDateFrom,
+            @Param("expireDateTo") LocalDate expireDateTo,
+            @Param("confirmStatus") ConfirmStatus confirmStatus,
+            @Param("processStatus") ProcessStatus processStatus,
+            @Param("category") String category);
 }
