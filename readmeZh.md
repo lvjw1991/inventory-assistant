@@ -97,7 +97,7 @@ Excel 转换
 * 库存数据导入
 * 点货流程
 
-### 手机端 //todo
+### 手机端
 
 通过浏览器访问，不需要安装 App。
 
@@ -108,7 +108,7 @@ Excel 转换
 * 录入有效期
 * 修改错误数据
 * 查看点货进度
-* 临期商品查询
+* 临期商品处理
 
 ---
 
@@ -116,7 +116,7 @@ Excel 转换
 
 ### Backend
 
-* Java 17
+* Java 21
 * Spring Boot
 * Spring MVC
 * Spring Data JPA
@@ -405,7 +405,7 @@ docker compose down
 
 ### PC 管理后台
 
-#### Dashboard //todo
+#### Dashboard //todo 二期
 
 > TODO: 添加 Dashboard 截图
 
@@ -428,23 +428,23 @@ docker compose down
 <img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/c6050cad-7af3-4ded-a8b3-89bb5b37743f" />
 
 
-### 手机点货 //todo
+### 手机点货 
+
+#### 订单列表
+
+<img width="761" height="863" alt="image" src="https://github.com/user-attachments/assets/aa5689d2-43df-401e-b1de-75cbfab06dc5" />
 
 #### 点货列表
 
-> TODO: 添加手机点货列表截图
+<img width="789" height="857" alt="image" src="https://github.com/user-attachments/assets/e06ce5e3-9c60-4d46-a3f2-4957b1aad267" />
 
-#### Barcode 扫描
+#### 点货详情
 
-> TODO: 添加 Barcode 扫描截图
+<img width="608" height="878" alt="image" src="https://github.com/user-attachments/assets/59ba5d4b-f71b-41cf-837f-b3234aac200a" />
 
-#### 有效期录入
+#### 临期处理
 
-> TODO: 添加有效期录入截图
-
-#### 点货进度
-
-> TODO: 添加点货进度截图
+<img width="569" height="864" alt="image" src="https://github.com/user-attachments/assets/48fabfd6-6a17-4d1a-a153-8ef2ae216149" />
 
 ---
 
@@ -458,7 +458,7 @@ docker compose down
 * [x] 商品 Barcode 管理
 * [x] Supplier Code → Barcode 映射
 * [x] 来货单 Excel 导入
-//todo 手机点货
+* [x] 手机点货
 * [x] Barcode 录入
 * [x] 有效期录入
 * [x] 点货结果修改
