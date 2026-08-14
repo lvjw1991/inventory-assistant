@@ -118,7 +118,7 @@ It is mainly used for:
 
 ### Backend
 
-* Java 17
+* Java 21
 * Spring Boot
 * Spring MVC
 * Spring Data JPA
@@ -432,23 +432,23 @@ docker compose down
 
 <img width="1920" height="1008" alt="Expiry Management" src="https://github.com/user-attachments/assets/c6050cad-7af3-4ded-a8b3-89bb5b37743f" />
 
-### Mobile Checking //todo
+### Mobile Checking 
+
+#### Order List
+
+<img width="761" height="863" alt="image" src="https://github.com/user-attachments/assets/aa5689d2-43df-401e-b1de-75cbfab06dc5" />
 
 #### Checking List
 
-> TODO: Add mobile checking list screenshot
+<img width="789" height="857" alt="image" src="https://github.com/user-attachments/assets/e06ce5e3-9c60-4d46-a3f2-4957b1aad267" />
 
-#### Barcode Scanning
+#### Checking detail
 
-> TODO: Add barcode scanning screenshot
+<img width="608" height="878" alt="image" src="https://github.com/user-attachments/assets/59ba5d4b-f71b-41cf-837f-b3234aac200a" />
 
-#### Expiry Date Entry
+#### Expiry handling
 
-> TODO: Add expiry date entry screenshot
-
-#### Checking Progress
-
-> TODO: Add checking progress screenshot
+<img width="569" height="864" alt="image" src="https://github.com/user-attachments/assets/1203c85b-60d8-4464-81a4-473cd88a8513" />
 
 ---
 
