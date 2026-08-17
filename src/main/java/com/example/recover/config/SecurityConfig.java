@@ -33,7 +33,17 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            // Vue 前端
+            "/",
+            "/index.html",
+            "/assets/**",
+            "/login",
+            "/m/**",
+            "/receiving-orders/**",
+            "/expiry-records/**",
+            "/suppliers/**",
+            "/supplier-products/**"
     };
 
     @Bean
