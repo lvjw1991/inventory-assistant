@@ -362,41 +362,38 @@ PUT /api/expiry-records/{id}
 
 ---
 
-## 6. Docker  //fixme
+## 6.部署
 
-系统使用 Docker 进行部署。
 
 核心服务：
 
 ```text
-docker-compose
-│
-├── backend
-│   └── Spring Boot
-│
-├── frontend
-│   └── Vue
-│
-└── mysql
-    └── MySQL 8
+VPS
+├── Java 21
+├── Spring Boot
+│   └── 内置 Vue dist
+└── MySQL 8.4 Docker
+        │
+        └── 数据
 ```
 
-启动：
+前端先打包：
 
 ```bash
-docker compose up -d
+npm run build
 ```
 
-查看运行状态：
+把 dist 放进 Spring Boot：
 
 ```bash
-docker compose ps
+src/main/resources/static/
 ```
 
-停止：
+启动 Spring Boot：
 
 ```bash
-docker compose down
+mvn clean package
+java -jar xxx.jar
 ```
 
 ---
