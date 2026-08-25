@@ -402,10 +402,6 @@ java -jar xxx.jar
 
 ### PC 管理后台
 
-#### Dashboard //todo 二期
-
-> TODO: 添加 Dashboard 截图
-
 #### 来货单管理
 
 <img width="1920" height="1008" alt="image" src="https://github.com/user-attachments/assets/96d739ff-999a-4aee-ae4d-9908504d879c" />
@@ -464,6 +460,20 @@ java -jar xxx.jar
 * [x] 临期商品查询
 * [x] 有效期处理记录
 * [x] 正常销售 / 已打折等处理方式
+
+### Phase 1.1 — Wolt Integration
+批量下架
+* 1.1 导入posexcel 筛选出库存<=5
+* 1.2 wolt get api  筛选出enabled = true
+* 1.3 java内存比对，相当于vlookup
+* 1.4 wolt update api, 把库存<=5的商品enabled=false
+
+批量上架
+* 2.1 入口收货单管理列表操作
+* 2.2 wolt get api
+* 2.3 根据货单明细比对价格和enabled
+* 2.4 wolt update api 修改价格和enabled= true
+* 2.5 保留新品，人工新增，不走wolt create api
 
 ### Phase 2 — Sales Integration
 
