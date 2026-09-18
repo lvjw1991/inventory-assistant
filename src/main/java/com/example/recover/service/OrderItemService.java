@@ -6,6 +6,7 @@ import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderItemRepository;
+import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.OrderItemConverter;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
@@ -113,6 +114,7 @@ public class OrderItemService {
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getCheckStatus());
+        orderItem.setDamageQty(request.getDamageQty());
         return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
     }
 
@@ -137,6 +139,7 @@ public class OrderItemService {
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getCheckStatus());
+        orderItem.setDamageQty(request.getDamageQty());
         return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
     }
 
@@ -159,11 +162,14 @@ public class OrderItemService {
     public Result<Boolean> check(Long id, OrderItemCheckRequest request) {
         ReceivingOrderItem orderItem = findEntityById(id);
         orderItem.setBarcode(request.getBarcode());
-        orderItem.setActualQty(request.getActualQty());
         orderItem.setExpiryDate(Strings.join(deduplicationList(request.getExpiryDate()), ','));
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getStatus());
+        if(request.getStatus().equals(CheckStatus.FAIL)){
+            orderItem.setActualQty(request.getActualQty());
+            orderItem.setDamageQty(request.getDamageQty());
+        }
         orderItemRepository.save(orderItem);
         orderService.updateProcess(orderItem.getReceivingOrderId());
         return Result.success(true);

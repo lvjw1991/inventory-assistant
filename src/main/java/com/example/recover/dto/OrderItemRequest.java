@@ -26,5 +26,6 @@ public class OrderItemRequest {
     private String sugar;
     @Enumerated(EnumType.STRING)
     private CheckStatus checkStatus;
+    private Integer damageQty;
 
 }

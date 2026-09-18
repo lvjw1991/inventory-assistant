@@ -24,6 +24,7 @@ public class OrderItemConverter {
         orderItemVO.setCategory(item.getCategory());
         orderItemVO.setSugar(item.getSugar());
         orderItemVO.setCheckStatus(item.getCheckStatus() != null ? item.getCheckStatus().name() : "");
+        orderItemVO.setDamageQty(item.getDamageQty());
         return orderItemVO;
     }
 }

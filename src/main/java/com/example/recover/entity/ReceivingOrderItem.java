@@ -29,5 +29,5 @@ public class ReceivingOrderItem extends BaseEntity {
     private String sugar;
     @Enumerated(EnumType.STRING)
     private CheckStatus checkStatus;
-
+    private Integer damageQty;
 }

@@ -23,5 +23,5 @@ public class OrderItemCheckRequest {
     @NotNull(message = "status不能为空")
     private CheckStatus status;
 
-
+    private Integer damageQty;
 }

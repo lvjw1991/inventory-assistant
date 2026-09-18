@@ -31,7 +31,7 @@ class OrderItemServiceTests {
 
     @Test
     void page() {
-        Long orderId=5L;
+        Long orderId=10L;
         OrderItemQuery orderItemQuery = new OrderItemQuery();
         orderItemQuery.setOrderId(orderId);
         orderItemQuery.setCheckStatus(CheckStatus.PASS);
@@ -45,11 +45,25 @@ class OrderItemServiceTests {
 
     @Test
     void check() {
-        Long orderItemId=95L;
+        Long orderItemId=211L;
         OrderItemCheckRequest request = new OrderItemCheckRequest();
         request.setStatus(CheckStatus.PASS);
         request.setBarcode("8082481440560");
         request.setExpiryDate(List.of("2026-09-05","2026-09-08"));
+        Result<Boolean> check = service.check(orderItemId, request);
+        assertEquals("success", check.getMessage());
+
+    }
+
+    @Test
+    void check2() {
+        Long orderItemId=211L;
+        OrderItemCheckRequest request = new OrderItemCheckRequest();
+        request.setStatus(CheckStatus.FAIL);
+        request.setBarcode("8082481440560");
+        request.setExpiryDate(List.of("2026-09-05","2026-09-08"));
+        request.setActualQty(10);
+        request.setDamageQty(5);
         Result<Boolean> check = service.check(orderItemId, request);
         assertEquals("success", check.getMessage());
 

@@ -46,5 +46,8 @@ public class OrderItemVO {
     @Schema(description = "是否正确", example = "UNCHECKED,PASS,FAIL")
     private String checkStatus;
 
+    @ExcelProperty("damageQty")
+    private Integer damageQty;
+
 
 }
