@@ -1,9 +1,11 @@
 package com.example.recover.service;
 
 import com.example.recover.dto.*;
+import com.example.recover.entity.Product;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ExpiryRecordRepository;
+import com.example.recover.repository.ProductRepository;
 import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ExcelUtils;
 import com.example.recover.utils.ExpiryRecordConverter;
@@ -37,6 +39,8 @@ public class ExpiryRecordService {
 
     private final ExpiryRecordConverter expiryRecordConverter;
 
+    private final ProductRepository productRepository;
+
     public Result<PageResponse<ExpiryRecordVO>> search(RecordQuery query) {
         Pageable pageable = PageRequest.of(
                 query.getPageNum(), query.getPageSize(),
@@ -46,6 +50,13 @@ public class ExpiryRecordService {
                 query.getCategory(), query.getBarcode(), pageable)));
     }
 
+    /**
+     * 只更新下个月未确认的库存数据
+     *
+     * @param file
+     * @return
+     * @throws IOException
+     */
     @Transactional
     public Result<ImportResultVO> importExcel(MultipartFile file) throws IOException {
         List<BarcodeStockRow> rowList = ExcelUtils.read(file, BarcodeStockRow.class);
@@ -59,9 +70,17 @@ public class ExpiryRecordService {
                         BarcodeStockRow::getStock
                 ));
         int success = 0, skip = 0;
-        ExpiryRecord expiryRecord = new ExpiryRecord();
-        expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
-        List<ExpiryRecord> list = expiryRecordRepository.findAll(Example.of(expiryRecord));
+        LocalDate start = LocalDate.now()
+                .plusMonths(1)
+                .withDayOfMonth(1);
+        LocalDate end = LocalDate.now()
+                .plusMonths(2)
+                .withDayOfMonth(1);
+        List<ExpiryRecord> list = expiryRecordRepository.findByConfirmStatusAndExpiryDateGreaterThanEqualAndExpiryDateLessThan(
+                ConfirmStatus.UNCONFIRM, start, end);
+        if (list.isEmpty()) {
+            return new ImportResultVO(success, skip);
+        }
         List<ExpiryRecord> updateList = new ArrayList<>();
         for (ExpiryRecord record : list) {
             if (stockMap.containsKey(record.getBarcode())) {
@@ -78,7 +97,12 @@ public class ExpiryRecordService {
 
     public Result<ExpiryRecordVO> findById(Long id) {
         ExpiryRecord expiryRecord = findEntityById(id);
-        return Result.success(expiryRecordConverter.toVO(expiryRecord));
+        ExpiryRecordVO vo = expiryRecordConverter.toVO(expiryRecord);
+        Product byBarcode = productRepository.findByBarcode(vo.getBarcode());
+        if (byBarcode != null) {
+            vo.setImgUrl(byBarcode.getImgUrl());
+        }
+        return Result.success(vo);
     }
 
     @Transactional
@@ -105,18 +129,20 @@ public class ExpiryRecordService {
     @Transactional
     public Result<Boolean> process(ExpiryProcessRequest request) {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
-        if(ConfirmStatus.UNCONFIRM.equals(expiryRecord.getConfirmStatus())){
+        if (ConfirmStatus.UNCONFIRM.equals(expiryRecord.getConfirmStatus())) {
             return Result.fail(500, "商品尚未确认，不能进行处理");
         }
         expiryRecord.setProcessStatus(request.getProcessStatus());
         expiryRecord.setProcessRemark(request.getProcessRemark());
         expiryRecord.setProcessTime(LocalDateTime.now());
+        expiryRecord.setStock(request.getStock());
         expiryRecordRepository.save(expiryRecord);
         return Result.success(true);
     }
 
     /**
      * batch
+     *
      * @param orderItemList
      */
     @Transactional
@@ -166,16 +192,26 @@ public class ExpiryRecordService {
         LocalDate date = request.getExpiryDate();
         boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
         if (exist) {
-            return Result.fail(500, "barcode, date重复");
+            return Result.fail(500, "barcode, date重复, 无需新增");
         }
         ExpiryRecord expiryRecord = new ExpiryRecord();
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
+        expiryRecord.setConfirmStatus(ConfirmStatus.CONFIRM);
+        expiryRecord.setConfirmTime(LocalDateTime.now());
         expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
-        expiryRecord.setProductName(request.getProductName());
+        expiryRecord.setProductName(getProductNameByBarcode(barcode));
+        expiryRecord.setStock(request.getStock());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
+    }
+
+    private String getProductNameByBarcode(String barcode) {
+        Product byBarcode = productRepository.findByBarcode(barcode);
+        if (byBarcode != null) {
+            return byBarcode.getName();
+        }
+        return "";
     }
 
     @Transactional
@@ -190,14 +226,15 @@ public class ExpiryRecordService {
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        expiryRecord.setProductName(request.getProductName());
+        expiryRecord.setProductName(getProductNameByBarcode(barcode));
+        expiryRecord.setStock(request.getStock());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }
 
     public Result<List<ExpiryRecordVO>> searchMonthly(RecordMonthlyQuery query) {
         LocalDate expireDateFrom = query.getExpireDateFrom();
         LocalDate expireDateTo = query.getExpireDateTo();
-        if(ChronoUnit.DAYS.between(expireDateFrom, expireDateTo) > 60){
+        if (ChronoUnit.DAYS.between(expireDateFrom, expireDateTo) > 60) {
             return Result.fail(500, "请用分页接口");
         }
         return Result.success(expiryRecordRepository.findMonthly(query.getExpireDateFrom(),

@@ -87,4 +87,10 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
             @Param("confirmStatus") ConfirmStatus confirmStatus,
             @Param("processStatus") ProcessStatus processStatus,
             @Param("category") String category);
+
+    List<ExpiryRecord> findByConfirmStatusAndExpiryDateGreaterThanEqualAndExpiryDateLessThan(
+            ConfirmStatus confirmStatus,
+            LocalDate start,
+            LocalDate end
+    );
 }

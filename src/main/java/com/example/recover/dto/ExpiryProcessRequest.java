@@ -14,5 +14,7 @@ public class ExpiryProcessRequest {
 
     private String processRemark;
 
+    private Integer stock;
+
 
 }
