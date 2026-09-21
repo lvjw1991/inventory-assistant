@@ -166,6 +166,7 @@ public class OrderItemService {
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getStatus());
+        orderItem.setTotal(request.getTotal());
         if(request.getStatus().equals(CheckStatus.FAIL)){
             orderItem.setActualQty(request.getActualQty());
             orderItem.setDamageQty(request.getDamageQty());

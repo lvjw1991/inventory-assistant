@@ -13,6 +13,7 @@ public class OrderItemCheckRequest {
     @NotBlank(message = "barcode不能为空")
     private String barcode;
     private Integer actualQty;
+    private Integer total;
     private List<String> expiryDate;
 
     @NotBlank(message = "category不能为空")
