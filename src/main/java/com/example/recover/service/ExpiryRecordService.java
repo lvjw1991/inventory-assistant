@@ -3,6 +3,7 @@ package com.example.recover.service;
 import com.example.recover.dto.*;
 import com.example.recover.entity.Product;
 import com.example.recover.entity.ReceivingOrderItem;
+import com.example.recover.exception.BusinessException;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ExpiryRecordRepository;
 import com.example.recover.repository.ProductRepository;
@@ -13,7 +14,6 @@ import com.example.recover.utils.ProcessStatus;
 import com.example.recover.vo.*;
 import com.example.recover.entity.ExpiryRecord;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -64,11 +64,16 @@ public class ExpiryRecordService {
     }
 
     public ImportResultVO updateStock(List<BarcodeStockRow> rowList) {
-        Map<String, Integer> stockMap = rowList.stream()
-                .collect(Collectors.toMap(
-                        BarcodeStockRow::getBarcode,
-                        BarcodeStockRow::getStock
-                ));
+        Map<String, Integer> stockMap = null;
+        try {
+            stockMap = rowList.stream()
+                    .collect(Collectors.toMap(
+                            BarcodeStockRow::getBarcode,
+                            BarcodeStockRow::getStock
+                    ));
+        } catch (IllegalStateException e) {
+            throw new BusinessException(500, "Excel 中存在重复 barcode");
+        }
         int success = 0, skip = 0;
         LocalDate start = LocalDate.now()
                 .plusMonths(1)

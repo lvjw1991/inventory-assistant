@@ -1,5 +1,6 @@
 package com.example.recover.controller;
 
+import com.example.recover.vo.ImportResultVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.dto.ProductRequest;
 import com.example.recover.vo.Result;
@@ -8,6 +9,9 @@ import com.example.recover.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/products")
@@ -57,5 +61,10 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Result<Boolean> delete(@PathVariable Long id) {
         return productService.delete(id);
+    }
+
+    @PostMapping("/import")
+    public Result<ImportResultVO> importExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        return productService.importExcel(file);
     }
 }
