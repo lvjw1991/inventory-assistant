@@ -13,6 +13,8 @@ import java.io.IOException;
 public class SpaWebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/damage/**")
+                .addResourceLocations("file:./uploads/damage/");
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
                 .resourceChain(true)

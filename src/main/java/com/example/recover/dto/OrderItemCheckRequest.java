@@ -25,4 +25,8 @@ public class OrderItemCheckRequest {
     private CheckStatus status;
 
     private Integer damageQty;
+
+    private String remark;
+
+    private List<String> damageImgList;
 }

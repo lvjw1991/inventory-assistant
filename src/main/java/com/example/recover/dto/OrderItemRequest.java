@@ -27,5 +27,7 @@ public class OrderItemRequest {
     @Enumerated(EnumType.STRING)
     private CheckStatus checkStatus;
     private Integer damageQty;
+    private String remark;
+    private List<String> damageImgList;
 
 }

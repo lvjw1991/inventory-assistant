@@ -30,4 +30,5 @@ public class ReceivingOrderItem extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CheckStatus checkStatus;
     private Integer damageQty;
+    private String remark;
 }

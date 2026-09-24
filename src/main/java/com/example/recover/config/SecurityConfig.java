@@ -43,7 +43,9 @@ public class SecurityConfig {
             "/receiving-orders/**",
             "/expiry-records/**",
             "/suppliers/**",
-            "/supplier-products/**"
+            "/supplier-products/**",
+            // 上传图片，允许未登录访问
+            "/uploads/damage/**"
     };
 
     @Bean

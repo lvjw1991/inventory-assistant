@@ -35,6 +35,8 @@ public class OrderItemService {
 
     private final OrderService orderService;
 
+    private final OrderDamageService orderDamageService;
+
     public Result<PageResponse<OrderItemVO>> findAllByPage(OrderItemQuery itemQuery) {
         Specification<ReceivingOrderItem> spec = (root, query, cb) -> {
 
@@ -84,7 +86,7 @@ public class OrderItemService {
         Pageable pageable = PageRequest.of(itemQuery.getPageNum(), itemQuery.getPageSize(),
                 Sort.by(
                         Sort.Direction.ASC,
-                        "supplierCode"
+                        "expiryDate"
                 )
         );
         return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(orderItemConverter::toVo)));
@@ -92,7 +94,10 @@ public class OrderItemService {
 
     public Result<OrderItemVO> findById(Long id) {
         ReceivingOrderItem orderItem = orderItemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(404, "ResourceNotFoundException"));
-        return Result.success(orderItemConverter.toVo(orderItem));
+        OrderItemVO vo= orderItemConverter.toVo(orderItem);
+        Result<List<String>> byItemId = orderDamageService.findByItemId(id);
+        vo.setDamageImgList(byItemId.getData());
+        return Result.success(vo);
     }
 
     public ReceivingOrderItem findEntityById(Long id) {
@@ -113,9 +118,13 @@ public class OrderItemService {
         orderItem.setUnitPrice(request.getUnitPrice());
         orderItem.setCategory(request.getCategory());
         orderItem.setSugar(request.getSugar());
-        orderItem.setCheckStatus(request.getCheckStatus());
+        orderItem.setCheckStatus(CheckStatus.FAIL);
         orderItem.setDamageQty(request.getDamageQty());
-        return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
+        orderItem.setRemark(request.getRemark());
+        OrderItemVO vo = orderItemConverter.toVo(orderItemRepository.save(orderItem));
+        //保存破损图片记录
+        orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
+        return Result.success(vo);
     }
 
     private List<String> deduplicationList(List<String> expiryDate) {
@@ -140,6 +149,9 @@ public class OrderItemService {
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getCheckStatus());
         orderItem.setDamageQty(request.getDamageQty());
+        orderItem.setRemark(request.getRemark());
+        //保存破损图片记录
+        orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
         return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
     }
 
@@ -170,6 +182,9 @@ public class OrderItemService {
         if(request.getStatus().equals(CheckStatus.FAIL)){
             orderItem.setActualQty(request.getActualQty());
             orderItem.setDamageQty(request.getDamageQty());
+            orderItem.setRemark(request.getRemark());
+            //保存破损图片记录
+            orderDamageService.upsert(request.getDamageImgList(), id);
         }
         orderItemRepository.save(orderItem);
         orderService.updateProcess(orderItem.getReceivingOrderId());
