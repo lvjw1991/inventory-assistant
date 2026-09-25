@@ -25,4 +25,7 @@ public class OrderItemRow {
 
     @ExcelProperty("type")
     private String category;
+
+    @ExcelProperty("cartonQty")
+    private Integer cartonQty;
 }

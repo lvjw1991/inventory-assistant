@@ -93,4 +93,18 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
             LocalDate start,
             LocalDate end
     );
+
+    @Query("""
+    SELECT e.expiryDate
+    FROM ExpiryRecord e
+    WHERE e.barcode = :barcode
+      AND e.expiryDate >= :today
+      AND e.id <> :id
+    ORDER BY e.id ASC
+    """)
+    List<LocalDate> findOtherExpiryDates(
+            @Param("barcode") String barcode,
+            @Param("today") LocalDate today,
+            @Param("id") Long id
+    );
 }

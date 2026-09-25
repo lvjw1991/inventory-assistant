@@ -8,6 +8,8 @@ import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderItemRepository;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.OrderItemConverter;
+import com.example.recover.utils.OrderItemListConverter;
+import com.example.recover.vo.OrderItemListVO;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -37,7 +39,9 @@ public class OrderItemService {
 
     private final OrderDamageService orderDamageService;
 
-    public Result<PageResponse<OrderItemVO>> findAllByPage(OrderItemQuery itemQuery) {
+    private final OrderItemListConverter listConverter;
+
+    public Result<PageResponse<OrderItemListVO>> findAllByPage(OrderItemQuery itemQuery) {
         Specification<ReceivingOrderItem> spec = (root, query, cb) -> {
 
             List<Predicate> predicates = new ArrayList<>();
@@ -79,6 +83,16 @@ public class OrderItemService {
                 );
             }
 
+            // barcode 模糊查询
+            if (itemQuery.getBarcode() != null && !itemQuery.getBarcode().isBlank()) {
+                predicates.add(
+                        cb.like(
+                                root.get("barcode"),
+                                itemQuery.getBarcode().trim() + "%"
+                        )
+                );
+            }
+
             return cb.and(
                     predicates.toArray(new Predicate[0])
             );
@@ -89,7 +103,7 @@ public class OrderItemService {
                         "expiryDate"
                 )
         );
-        return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(orderItemConverter::toVo)));
+        return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(listConverter::toVo)));
     }
 
     public Result<OrderItemVO> findById(Long id) {
@@ -121,6 +135,7 @@ public class OrderItemService {
         orderItem.setCheckStatus(CheckStatus.FAIL);
         orderItem.setDamageQty(request.getDamageQty());
         orderItem.setRemark(request.getRemark());
+        orderItem.setCartonQty(request.getCartonQty());
         OrderItemVO vo = orderItemConverter.toVo(orderItemRepository.save(orderItem));
         //保存破损图片记录
         orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
@@ -150,6 +165,7 @@ public class OrderItemService {
         orderItem.setCheckStatus(request.getCheckStatus());
         orderItem.setDamageQty(request.getDamageQty());
         orderItem.setRemark(request.getRemark());
+        orderItem.setCartonQty(request.getCartonQty());
         //保存破损图片记录
         orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
         return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));

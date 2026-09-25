@@ -31,4 +31,5 @@ public class ReceivingOrderItem extends BaseEntity {
     private CheckStatus checkStatus;
     private Integer damageQty;
     private String remark;
+    private Integer cartonQty;
 }

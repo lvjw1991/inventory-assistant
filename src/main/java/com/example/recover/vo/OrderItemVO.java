@@ -55,4 +55,7 @@ public class OrderItemVO {
 
     private List<String> damageImgList;
 
+    @ExcelProperty("cartonQty")
+    private Integer cartonQty;
+
 }

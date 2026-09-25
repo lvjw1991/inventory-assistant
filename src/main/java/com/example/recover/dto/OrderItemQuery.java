@@ -18,6 +18,8 @@ public class OrderItemQuery {
 
     private CheckStatus checkStatus;
 
+    private String barcode;
+
     @Schema(description = "页码，从0开始", example = "0")
     private Integer pageNum = 0;
 

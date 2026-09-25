@@ -6,6 +6,7 @@ import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
+import com.example.recover.vo.OrderItemListVO;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -37,7 +38,7 @@ class OrderItemServiceTests {
         orderItemQuery.setCheckStatus(CheckStatus.PASS);
         orderItemQuery.setProductName("Kimchi");
         orderItemQuery.setSupplierCode("3");
-        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(orderItemQuery);
+        Result<PageResponse<OrderItemListVO>> allByPage = service.findAllByPage(orderItemQuery);
         System.out.println(JSON.toJSONString(allByPage));
         assertEquals("success", allByPage.getMessage());
 
@@ -71,7 +72,7 @@ class OrderItemServiceTests {
 
     @Test
     void export(){
-        Long orderId=5L;
+        Long orderId=10L;
         List<OrderItemVO> allByOrderId = service.findAllByOrderId(orderId);
         // 写入本地文件
         String path = "src/test/resources/export_" +
@@ -87,9 +88,9 @@ class OrderItemServiceTests {
         Long orderId=5L;
         OrderItemQuery orderItemQuery = new OrderItemQuery();
         orderItemQuery.setOrderId(orderId);
-        Result<PageResponse<OrderItemVO>> allByPage = service.findAllByPage(orderItemQuery);
-        List<OrderItemVO> list = allByPage.getData().getList();
-        for (OrderItemVO item : list){
+        Result<PageResponse<OrderItemListVO>> allByPage = service.findAllByPage(orderItemQuery);
+        List<OrderItemListVO> list = allByPage.getData().getList();
+        for (OrderItemListVO item : list){
             if(item.getCheckStatus().equals(CheckStatus.UNCHECKED.name())) {
                 // 简化的任意日期生成示例
                 int year = ThreadLocalRandom.current().nextInt(2027, 2031);

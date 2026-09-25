@@ -26,6 +26,7 @@ public class OrderItemConverter {
         orderItemVO.setCheckStatus(item.getCheckStatus() != null ? item.getCheckStatus().name() : "");
         orderItemVO.setDamageQty(item.getDamageQty());
         orderItemVO.setRemark(item.getRemark());
+        orderItemVO.setCartonQty(item.getCartonQty());
         return orderItemVO;
     }
 }

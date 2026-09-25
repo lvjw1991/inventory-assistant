@@ -7,10 +7,7 @@ import com.example.recover.exception.BusinessException;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ExpiryRecordRepository;
 import com.example.recover.repository.ProductRepository;
-import com.example.recover.utils.ConfirmStatus;
-import com.example.recover.utils.ExcelUtils;
-import com.example.recover.utils.ExpiryRecordConverter;
-import com.example.recover.utils.ProcessStatus;
+import com.example.recover.utils.*;
 import com.example.recover.vo.*;
 import com.example.recover.entity.ExpiryRecord;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +37,8 @@ public class ExpiryRecordService {
     private final ExpiryRecordConverter expiryRecordConverter;
 
     private final ProductRepository productRepository;
+
+    private final ExpiryRecordDetailConverter detailConverter;
 
     public Result<PageResponse<ExpiryRecordVO>> search(RecordQuery query) {
         Pageable pageable = PageRequest.of(
@@ -100,13 +99,14 @@ public class ExpiryRecordService {
         return new ImportResultVO(success, skip);
     }
 
-    public Result<ExpiryRecordVO> findById(Long id) {
+    public Result<ExpiryRecordDetailVO> findById(Long id) {
         ExpiryRecord expiryRecord = findEntityById(id);
-        ExpiryRecordVO vo = expiryRecordConverter.toVO(expiryRecord);
+        ExpiryRecordDetailVO vo = detailConverter.toVO(expiryRecord);
         Product byBarcode = productRepository.findByBarcode(vo.getBarcode());
         if (byBarcode != null) {
             vo.setImgUrl(byBarcode.getImgUrl());
         }
+        vo.setOtherDateList(expiryRecordRepository.findOtherExpiryDates(expiryRecord.getBarcode(), LocalDate.now(), id));
         return Result.success(vo);
     }
 

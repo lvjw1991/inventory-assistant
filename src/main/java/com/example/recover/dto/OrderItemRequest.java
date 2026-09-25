@@ -29,5 +29,6 @@ public class OrderItemRequest {
     private Integer damageQty;
     private String remark;
     private List<String> damageImgList;
+    private Integer cartonQty;
 
 }

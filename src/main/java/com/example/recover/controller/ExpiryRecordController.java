@@ -2,10 +2,7 @@ package com.example.recover.controller;
 
 import com.example.recover.dto.*;
 import com.example.recover.service.ExpiryRecordService;
-import com.example.recover.vo.ExpiryRecordVO;
-import com.example.recover.vo.ImportResultVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.vo.Result;
+import com.example.recover.vo.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +30,7 @@ public class ExpiryRecordController {
      * 查询单个
      */
     @GetMapping("/{id}")
-    public Result<ExpiryRecordVO> getById(@PathVariable Long id) {
+    public Result<ExpiryRecordDetailVO> getById(@PathVariable Long id) {
         return expiryRecordService.findById(id);
     }
 

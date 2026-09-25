@@ -5,6 +5,7 @@ import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.service.OrderItemService;
+import com.example.recover.vo.OrderItemListVO;
 import com.example.recover.vo.OrderItemVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.vo.Result;
@@ -29,7 +30,7 @@ public class OrderItemController {
      * 查询全部
      */
     @GetMapping
-    public Result<PageResponse<OrderItemVO>> search(OrderItemQuery query) {
+    public Result<PageResponse<OrderItemListVO>> search(OrderItemQuery query) {
         return orderItemService.findAllByPage(query);
     }
 

@@ -16,7 +16,6 @@ public class OrderItemCheckRequest {
     private Integer total;
     private List<String> expiryDate;
 
-    @NotBlank(message = "category不能为空")
     private String category;
 
     private String sugar;
