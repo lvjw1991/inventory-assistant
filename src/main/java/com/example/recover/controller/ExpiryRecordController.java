@@ -22,7 +22,7 @@ public class ExpiryRecordController {
      * 查询全部
      */
     @GetMapping
-    public Result<PageResponse<ExpiryRecordVO>> search(RecordQuery query) {
+    public Result<PageResponse<ExpiryRecordListVO>> search(RecordQuery query) {
         return expiryRecordService.search(query);
     }
 

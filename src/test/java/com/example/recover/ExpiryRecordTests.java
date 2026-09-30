@@ -72,10 +72,10 @@ class ExpiryRecordTests {
         RecordQuery recordQuery = new RecordQuery();
         recordQuery.setConfirmStatus(ConfirmStatus.UNCONFIRM);
         recordQuery.setCategory("Fresh");
-        Result<PageResponse<ExpiryRecordVO>> search = service.search(recordQuery);
+        Result<PageResponse<ExpiryRecordListVO>> search = service.search(recordQuery);
         System.out.println(JSON.toJSONString(search));
         assertEquals("success", search.getMessage());
-        ExpiryRecordVO first = search.getData().getList().getFirst();
+        ExpiryRecordListVO first = search.getData().getList().getFirst();
         ExpiryConfirmRequest expiryConfirmRequest = new ExpiryConfirmRequest();
         expiryConfirmRequest.setId(first.getId());
         expiryConfirmRequest.setStock(first.getStock());
@@ -92,13 +92,13 @@ class ExpiryRecordTests {
     @Test
     void searchPage() {
         RecordQuery recordQuery = new RecordQuery();
-        recordQuery.setConfirmStatus(ConfirmStatus.UNCONFIRM);
-        recordQuery.setCategory("Fresh");
-        recordQuery.setBarcode("8082");
-        recordQuery.setProcessStatus(ProcessStatus.UNPROCESS);
-        recordQuery.setExpireDateFrom(LocalDate.of(2026, 9, 1));
-        recordQuery.setExpireDateTo(LocalDate.of(2026, 9, 30));
-        Result<PageResponse<ExpiryRecordVO>> search = service.search(recordQuery);
+        //recordQuery.setConfirmStatus(ConfirmStatus.UNCONFIRM);
+        //recordQuery.setCategory("Fresh");
+        //recordQuery.setBarcode("8082");
+        //recordQuery.setProcessStatus(ProcessStatus.UNPROCESS);
+        recordQuery.setCreateDateFrom(LocalDate.of(2026, 9, 1));
+        recordQuery.setCreateDateTo(LocalDate.of(2026, 9, 30));
+        Result<PageResponse<ExpiryRecordListVO>> search = service.search(recordQuery);
         System.out.println(JSON.toJSONString(search));
         assertEquals("success", search.getMessage());
     }

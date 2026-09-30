@@ -40,13 +40,15 @@ public class ExpiryRecordService {
 
     private final ExpiryRecordDetailConverter detailConverter;
 
-    public Result<PageResponse<ExpiryRecordVO>> search(RecordQuery query) {
+    public Result<PageResponse<ExpiryRecordListVO>> search(RecordQuery query) {
         Pageable pageable = PageRequest.of(
                 query.getPageNum(), query.getPageSize(),
                 Sort.by("expiryDate").ascending());
+        LocalDateTime start = query.getCreateDateFrom()==null ? null :query.getCreateDateFrom().atStartOfDay();
+        LocalDateTime end = query.getCreateDateTo()==null ? null :query.getCreateDateTo().plusDays(1).atStartOfDay();
         return Result.success(PageResponse.of(expiryRecordRepository.findPage(query.getExpireDateFrom(),
                 query.getExpireDateTo(), query.getConfirmStatus(), query.getProcessStatus(),
-                query.getCategory(), query.getBarcode(), pageable)));
+                query.getCategory(), query.getBarcode(), start, end, pageable)));
     }
 
     /**

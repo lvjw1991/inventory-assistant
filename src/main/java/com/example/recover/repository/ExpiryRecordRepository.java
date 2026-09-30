@@ -3,6 +3,7 @@ package com.example.recover.repository;
 import com.example.recover.entity.ExpiryRecord;
 import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ProcessStatus;
+import com.example.recover.vo.ExpiryRecordListVO;
 import com.example.recover.vo.ExpiryRecordVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -23,7 +25,7 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
     List<ExpiryRecord> findByBarcodeIn(List<String> barcodeList);
 
     @Query("""
-    SELECT new com.example.recover.vo.ExpiryRecordVO(
+    SELECT new com.example.recover.vo.ExpiryRecordListVO(
         e.id,
         e.barcode,
         e.expiryDate,
@@ -35,7 +37,8 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
         e.processRemark,
         e.category,
         e.productName,
-        p.imgUrl
+        p.imgUrl,
+        e.createdAt
     )
     FROM ExpiryRecord e
     LEFT JOIN Product p
@@ -47,14 +50,18 @@ public interface ExpiryRecordRepository extends JpaRepository<ExpiryRecord, Long
       AND (:processStatus IS NULL OR e.processStatus = :processStatus)
       AND (:expireDateFrom IS NULL OR e.expiryDate >= :expireDateFrom)
       AND (:expireDateTo IS NULL OR e.expiryDate <= :expireDateTo)
+      AND (:start IS NULL OR e.createdAt >= :start)
+      AND (:end IS NULL OR e.createdAt < :end)
 """)
-    Page<ExpiryRecordVO> findPage(
+    Page<ExpiryRecordListVO> findPage(
             @Param("expireDateFrom") LocalDate expireDateFrom,
             @Param("expireDateTo") LocalDate expireDateTo,
             @Param("confirmStatus") ConfirmStatus confirmStatus,
             @Param("processStatus") ProcessStatus processStatus,
             @Param("category") String category,
             @Param("barcode") String barcode,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
             Pageable pageable);
 
     @Query("""

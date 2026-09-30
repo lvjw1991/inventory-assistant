@@ -20,5 +20,9 @@ public class RecordQuery {
     private String barcode;
     private int pageNum = 0;
     private int pageSize = 20;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createDateFrom;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate createDateTo;
 
 }
