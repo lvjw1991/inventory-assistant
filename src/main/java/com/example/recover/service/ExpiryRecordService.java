@@ -203,7 +203,7 @@ public class ExpiryRecordService {
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        expiryRecord.setConfirmStatus(ConfirmStatus.CONFIRM);
+        expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
         expiryRecord.setConfirmTime(LocalDateTime.now());
         expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
         expiryRecord.setProductName(getProductNameByBarcode(barcode));
@@ -224,9 +224,13 @@ public class ExpiryRecordService {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
         String barcode = request.getBarcode();
         LocalDate date = request.getExpiryDate();
-        boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
-        if (exist) {
-            return Result.fail(500, "barcode, date重复");
+        boolean isRecordUnchanged = barcode.equals(expiryRecord.getBarcode())
+                && date.equals(expiryRecord.getExpiryDate());
+        if(!isRecordUnchanged){
+            boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
+            if (exist) {
+                return Result.fail(500, "barcode, date重复");
+            }
         }
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);

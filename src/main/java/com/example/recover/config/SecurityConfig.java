@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -60,6 +61,30 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register").hasRole("ADMIN")
                         // 放行登录注册接口
                         .requestMatchers("/api/auth/**").permitAll()
+                        // 收货单：ADMIN + STAFF
+                        .requestMatchers("/api/orders/**")
+                        .hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/api/items/**")
+                        .hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/api/damages/**")
+                        .hasAnyRole("ADMIN", "STAFF")
+                        // 有效期：ADMIN + STAFF
+                        .requestMatchers("/api/records/**")
+                        .hasAnyRole("ADMIN", "STAFF")
+                        // 供应商：查询可以给 STAFF，增删改只有 ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/suppliers/**")
+                        .hasAnyRole("ADMIN", "STAFF")
+                        .requestMatchers("/api/suppliers/**")
+                        .hasRole("ADMIN")
+                        // 供应商商品：ADMIN
+                        .requestMatchers("/api/codes/**")
+                        .hasRole("ADMIN")
+                        // 商品管理：ADMIN
+                        .requestMatchers("/api/products/**")
+                        .hasRole("ADMIN")
+                        // 用户管理：ADMIN
+                        .requestMatchers("/api/user/**")
+                        .hasRole("ADMIN")
                         // 其余接口需要登录
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
