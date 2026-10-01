@@ -11,6 +11,7 @@ import com.example.recover.utils.*;
 import com.example.recover.vo.*;
 import com.example.recover.entity.ExpiryRecord;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -237,7 +238,9 @@ public class ExpiryRecordService {
         expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        expiryRecord.setProductName(getProductNameByBarcode(barcode));
+        if(StringUtils.isBlank(expiryRecord.getProductName()) || !isRecordUnchanged){
+            expiryRecord.setProductName(getProductNameByBarcode(barcode));
+        }
         expiryRecord.setStock(request.getStock());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }
