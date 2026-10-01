@@ -1,6 +1,7 @@
 package com.example.recover.utils;
 
 import com.example.recover.entity.ReceivingOrderItem;
+import com.example.recover.vo.OrderItemListMobileVO;
 import com.example.recover.vo.OrderItemListVO;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,22 @@ public class OrderItemListConverter {
         listVO.setTotal(item.getTotal());
         listVO.setExpiryDate(item.getExpiryDate());
         listVO.setCheckStatus(item.getCheckStatus() != null ? item.getCheckStatus().name() : "");
+        return listVO;
+    }
+
+    public OrderItemListMobileVO toMobileVo(ReceivingOrderItem item) {
+        if (item == null) {
+            return null;
+        }
+        OrderItemListMobileVO listVO = new OrderItemListMobileVO();
+        listVO.setId(item.getId());
+        listVO.setSupplierCode(item.getSupplierCode());
+        listVO.setProductName(item.getProductName());
+        listVO.setBarcode(item.getBarcode());
+        listVO.setOrderQty(item.getOrderQty());
+        listVO.setExpiryDate(item.getExpiryDate());
+        listVO.setCheckStatus(item.getCheckStatus() != null ? item.getCheckStatus().name() : "");
+        listVO.setCategory(item.getCategory());
         return listVO;
     }
 }

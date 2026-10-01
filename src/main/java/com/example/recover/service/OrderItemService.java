@@ -1,6 +1,7 @@
 package com.example.recover.service;
 
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.entity.ReceivingOrderItem;
@@ -9,10 +10,7 @@ import com.example.recover.repository.ReceivingOrderItemRepository;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.OrderItemConverter;
 import com.example.recover.utils.OrderItemListConverter;
-import com.example.recover.vo.OrderItemListVO;
-import com.example.recover.vo.OrderItemVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.vo.Result;
+import com.example.recover.vo.*;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
@@ -212,5 +210,42 @@ public class OrderItemService {
         orderItem.setReceivingOrderId(orderId);
         Example<ReceivingOrderItem> example = Example.of(orderItem);
         return orderItemRepository.findAll(example).stream().map(orderItemConverter::toVo).toList();
+    }
+
+    public Result<PageResponse<OrderItemListMobileVO>> findAllByPage(OrderItemMobileQuery itemMobileQuery) {
+        Specification<ReceivingOrderItem> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            String keyword = itemMobileQuery.getKeyword();
+            String category = itemMobileQuery.getCategory();
+            CheckStatus checkStatus = itemMobileQuery.getCheckStatus();
+            predicates.add(
+                    cb.equal(
+                            root.get("receivingOrderId"),
+                            itemMobileQuery.getOrderId()
+                    )
+            );
+            if (keyword != null && !keyword.isBlank()) {
+                String like = "%" + keyword + "%";
+                predicates.add(cb.or(
+                        cb.like(root.get("productName"), like),
+                        cb.like(root.get("supplierCode"), like),
+                        cb.like(root.get("barcode"), like)
+                ));
+            }
+            if (category != null && !category.isBlank()) {
+                predicates.add(cb.equal(root.get("category"), category));
+            }
+            if (checkStatus != null) {
+                predicates.add(cb.equal(root.get("checkStatus"), checkStatus));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        Pageable pageable = PageRequest.of(itemMobileQuery.getPageNum(), itemMobileQuery.getPageSize(),
+                Sort.by(
+                        Sort.Direction.ASC,
+                        "expiryDate"
+                )
+        );
+        return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(listConverter::toMobileVo)));
     }
 }

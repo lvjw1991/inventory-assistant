@@ -2,13 +2,11 @@ package com.example.recover.controller;
 
 import com.alibaba.excel.EasyExcel;
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.service.OrderItemService;
-import com.example.recover.vo.OrderItemListVO;
-import com.example.recover.vo.OrderItemVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.vo.Result;
+import com.example.recover.vo.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +87,11 @@ public class OrderItemController {
         EasyExcel.write(response.getOutputStream(), OrderItemVO.class)
                 .sheet("货单列表")
                 .doWrite(list);
+    }
+
+    @GetMapping("/mobile")
+    public Result<PageResponse<OrderItemListMobileVO>> search(OrderItemMobileQuery query) {
+        return orderItemService.findAllByPage(query);
     }
 
 }

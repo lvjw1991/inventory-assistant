@@ -3,13 +3,11 @@ package com.example.recover;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemCheckRequest;
+import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
-import com.example.recover.vo.OrderItemListVO;
-import com.example.recover.vo.OrderItemVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.vo.Result;
+import com.example.recover.vo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -104,6 +102,20 @@ class OrderItemServiceTests {
                 service.check(item.getId(), request);
             }
         }
+
+    }
+
+    @Test
+    void pageMobile() {
+        Long orderId=15L;
+        OrderItemMobileQuery orderItemQuery = new OrderItemMobileQuery();
+        orderItemQuery.setOrderId(orderId);
+        orderItemQuery.setCheckStatus(CheckStatus.UNCHECKED);
+        orderItemQuery.setKeyword("Kimchi");
+        orderItemQuery.setCategory("Fresh");
+        Result<PageResponse<OrderItemListMobileVO>> allByPage = service.findAllByPage(orderItemQuery);
+        System.out.println(JSON.toJSONString(allByPage));
+        assertEquals("success", allByPage.getMessage());
 
     }
 
