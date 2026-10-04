@@ -224,23 +224,22 @@ public class ExpiryRecordService {
 
     @Transactional
     public Result<ExpiryRecordVO> update(ExpiryRecordRequest request) {
+        if (StringUtils.isBlank(request.getProductName())) {
+            return Result.fail(400, "商品名称不能为空");
+        }
         ExpiryRecord expiryRecord = findEntityById(request.getId());
-        String barcode = request.getBarcode();
+        String barcode = expiryRecord.getBarcode();
         LocalDate date = request.getExpiryDate();
-        boolean isRecordUnchanged = barcode.equals(expiryRecord.getBarcode())
-                && date.equals(expiryRecord.getExpiryDate());
-        if(!isRecordUnchanged){
+        boolean isExpiryDateUnchanged  = date.equals(expiryRecord.getExpiryDate());
+        if (!isExpiryDateUnchanged ) {
             boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
             if (exist) {
                 return Result.fail(500, "barcode, date重复");
             }
         }
-        expiryRecord.setBarcode(barcode);
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
-        if(StringUtils.isBlank(expiryRecord.getProductName()) || !isRecordUnchanged){
-            expiryRecord.setProductName(getProductNameByBarcode(barcode));
-        }
+        expiryRecord.setProductName(request.getProductName());
         expiryRecord.setStock(request.getStock());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }

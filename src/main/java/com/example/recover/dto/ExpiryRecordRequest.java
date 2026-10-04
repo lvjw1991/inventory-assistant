@@ -23,5 +23,7 @@ public class ExpiryRecordRequest {
 
     private Integer stock;
 
+    private String productName;
+
 
 }
