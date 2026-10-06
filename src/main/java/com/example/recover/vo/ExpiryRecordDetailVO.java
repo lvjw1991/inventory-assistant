@@ -2,6 +2,7 @@ package com.example.recover.vo;
 
 import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ProcessStatus;
+import com.example.recover.utils.SourceType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -45,4 +46,7 @@ public class ExpiryRecordDetailVO {
     private String imgUrl;
 
     private List<LocalDate> otherDateList;
+
+    @Schema(description = "来源", example = "RECEIVING,MANUAL")
+    private SourceType sourceType;
 }

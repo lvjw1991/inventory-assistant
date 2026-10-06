@@ -123,4 +123,11 @@ class ExpiryRecordTests {
         assertEquals("success", byId.getMessage());
     }
 
+    @Test
+    void searchBarcode() {
+        Result<ExpiryDateDetailVO> byBarcode = service.getByBarcode("012822009079");
+        System.out.println(JSON.toJSONString(byBarcode));
+        assertEquals("success", byBarcode.getMessage());
+    }
+
 }

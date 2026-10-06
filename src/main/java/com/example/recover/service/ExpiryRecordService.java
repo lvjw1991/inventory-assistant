@@ -45,8 +45,8 @@ public class ExpiryRecordService {
         Pageable pageable = PageRequest.of(
                 query.getPageNum(), query.getPageSize(),
                 Sort.by("expiryDate").ascending());
-        LocalDateTime start = query.getCreateDateFrom()==null ? null :query.getCreateDateFrom().atStartOfDay();
-        LocalDateTime end = query.getCreateDateTo()==null ? null :query.getCreateDateTo().plusDays(1).atStartOfDay();
+        LocalDateTime start = query.getCreateDateFrom() == null ? null : query.getCreateDateFrom().atStartOfDay();
+        LocalDateTime end = query.getCreateDateTo() == null ? null : query.getCreateDateTo().plusDays(1).atStartOfDay();
         return Result.success(PageResponse.of(expiryRecordRepository.findPage(query.getExpireDateFrom(),
                 query.getExpireDateTo(), query.getConfirmStatus(), query.getProcessStatus(),
                 query.getCategory(), query.getBarcode(), start, end, pageable)));
@@ -183,6 +183,7 @@ public class ExpiryRecordService {
                 expiryRecord.setConfirmStatus(ConfirmStatus.UNCONFIRM);
                 expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
                 expiryRecord.setProductName(item.getProductName());
+                expiryRecord.setSourceType(SourceType.RECEIVING);
                 saveList.add(expiryRecord);
                 // 加入 Set，防止本次 Excel 自己重复
                 existingKeys.add(key);
@@ -210,7 +211,7 @@ public class ExpiryRecordService {
         expiryRecord.setConfirmTime(LocalDateTime.now());
         expiryRecord.setProcessStatus(ProcessStatus.UNPROCESS);
         expiryRecord.setProductName(getProductNameByBarcode(barcode));
-        expiryRecord.setStock(request.getStock());
+        expiryRecord.setSourceType(SourceType.MANUAL);
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }
 
@@ -230,8 +231,8 @@ public class ExpiryRecordService {
         ExpiryRecord expiryRecord = findEntityById(request.getId());
         String barcode = expiryRecord.getBarcode();
         LocalDate date = request.getExpiryDate();
-        boolean isExpiryDateUnchanged  = date.equals(expiryRecord.getExpiryDate());
-        if (!isExpiryDateUnchanged ) {
+        boolean isExpiryDateUnchanged = date.equals(expiryRecord.getExpiryDate());
+        if (!isExpiryDateUnchanged) {
             boolean exist = expiryRecordRepository.existsByBarcodeAndExpiryDate(barcode, date);
             if (exist) {
                 return Result.fail(500, "barcode, date重复");
@@ -240,7 +241,6 @@ public class ExpiryRecordService {
         expiryRecord.setExpiryDate(date);
         expiryRecord.setCategory(request.getCategory());
         expiryRecord.setProductName(request.getProductName());
-        expiryRecord.setStock(request.getStock());
         return Result.success(expiryRecordConverter.toVO(expiryRecordRepository.save(expiryRecord)));
     }
 
@@ -253,5 +253,17 @@ public class ExpiryRecordService {
         return Result.success(expiryRecordRepository.findMonthly(query.getExpireDateFrom(),
                 query.getExpireDateTo(), query.getConfirmStatus(), query.getProcessStatus(),
                 query.getCategory()));
+    }
+
+    public Result<ExpiryDateDetailVO> getByBarcode(String barcode) {
+        ExpiryDateDetailVO expiryDateDetailVO = new ExpiryDateDetailVO();
+        expiryDateDetailVO.setBarcode(barcode);
+        Product byBarcode = productRepository.findByBarcode(barcode);
+        if (byBarcode != null) {
+            expiryDateDetailVO.setProductName(byBarcode.getName());
+            expiryDateDetailVO.setImgUrl(byBarcode.getImgUrl());
+        }
+        expiryDateDetailVO.setAllDateList(expiryRecordRepository.findAllExpiryDates(barcode, LocalDate.now()));
+        return Result.success(expiryDateDetailVO);
     }
 }

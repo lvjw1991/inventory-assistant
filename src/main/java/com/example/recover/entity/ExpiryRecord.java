@@ -2,6 +2,7 @@ package com.example.recover.entity;
 
 import com.example.recover.utils.ConfirmStatus;
 import com.example.recover.utils.ProcessStatus;
+import com.example.recover.utils.SourceType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -34,5 +35,8 @@ public class ExpiryRecord extends BaseEntity {
     private String processRemark;
     private String category;
     private String productName;
+
+    @Enumerated(EnumType.STRING)
+    private SourceType sourceType;
 
 }

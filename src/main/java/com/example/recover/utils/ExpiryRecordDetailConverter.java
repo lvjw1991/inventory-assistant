@@ -20,6 +20,7 @@ public class ExpiryRecordDetailConverter {
         vo.setProcessRemark(entity.getProcessRemark());
         vo.setCategory(entity.getCategory());
         vo.setProductName(entity.getProductName());
+        vo.setSourceType(entity.getSourceType());
         return vo;
     }
 }

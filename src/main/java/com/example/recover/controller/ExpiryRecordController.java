@@ -105,4 +105,9 @@ public class ExpiryRecordController {
         return expiryRecordService.searchMonthly(query);
     }
 
+    @GetMapping("/barcode/{barcode}")
+    public Result<ExpiryDateDetailVO> getByBarcode(@PathVariable String barcode) {
+        return expiryRecordService.getByBarcode(barcode);
+    }
+
 }
