@@ -23,10 +23,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,16 +86,23 @@ public class ExpiryRecordService {
             return new ImportResultVO(success, skip);
         }
         List<ExpiryRecord> updateList = new ArrayList<>();
+        Set<String> deleteSet = new HashSet<>();
         for (ExpiryRecord record : list) {
             if (stockMap.containsKey(record.getBarcode())) {
-                record.setStock(stockMap.get(record.getBarcode()));
-                updateList.add(record);
+                Integer stock = stockMap.get(record.getBarcode());
+                if(stock == 0){
+                    deleteSet.add(record.getBarcode());
+                }else{
+                    record.setStock(stock);
+                    updateList.add(record);
+                }
                 success++;
             } else {
                 skip++;
             }
         }
         expiryRecordRepository.saveAll(updateList);
+        expiryRecordRepository.deleteFutureRecordsByBarcodes(new ArrayList<>(deleteSet), LocalDate.now());
         return new ImportResultVO(success, skip);
     }
 
