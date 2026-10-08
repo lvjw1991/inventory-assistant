@@ -129,6 +129,7 @@ public class OrderService {
             orderItem.setCategory(row.getCategory());
             orderItem.setCheckStatus(CheckStatus.UNCHECKED);
             orderItem.setCartonQty(row.getCartonQty());
+            orderItem.setBarcode(row.getBarcode());
             orderItemList.add(orderItem);
         }
         List<ReceivingOrderItem> uniqueList = orderItemList.stream()

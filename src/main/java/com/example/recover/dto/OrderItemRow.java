@@ -28,4 +28,7 @@ public class OrderItemRow {
 
     @ExcelProperty("cartonQty")
     private Integer cartonQty;
+
+    @ExcelProperty("barcode")
+    private String barcode;
 }
