@@ -101,7 +101,7 @@ public class OrderService {
         return Result.success(true);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Result<ImportResultVO> importExcel(MultipartFile file, Long orderId) throws IOException {
         ReceivingOrder order = findEntityById(orderId);
         List<OrderItemRow> rows = ExcelUtils.read(file, OrderItemRow.class);

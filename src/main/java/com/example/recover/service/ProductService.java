@@ -75,7 +75,7 @@ public class ProductService {
         return Result.success(true);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Result<ImportResultVO> importExcel(MultipartFile file) throws IOException {
         List<BarcodeNameImgRow> rowList = ExcelUtils.read(file, BarcodeNameImgRow.class);
         ImportResultVO result = dealWith(rowList);
@@ -115,7 +115,7 @@ public class ProductService {
         return new ImportResultVO(success, skip);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Result<ImportResultVO> importPrice(MultipartFile file) throws IOException {
         List<BarcodeNamePriceRow> rowList = ExcelUtils.read(file, BarcodeNamePriceRow.class);
         ImportResultVO result = dealWithPrice(rowList);

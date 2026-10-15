@@ -56,7 +56,7 @@ public class ExpiryRecordService {
      * @return
      * @throws IOException
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Result<ImportResultVO> importExcel(MultipartFile file) throws IOException {
         List<BarcodeStockRow> rowList = ExcelUtils.read(file, BarcodeStockRow.class);
         return Result.success(updateStock(rowList));
