@@ -97,4 +97,9 @@ public class OrderDamageService {
         return Result.success(true);
     }
 
+    @Transactional
+    public Result<Boolean> deleteByItemId(Long itemId) {
+        damageRepository.deleteByReceivingOrderItemIdDirect(itemId);
+        return Result.success(true);
+    }
 }

@@ -198,6 +198,11 @@ public class OrderItemService {
             orderItem.setRemark(request.getRemark());
             //保存破损图片记录
             orderDamageService.upsert(request.getDamageImgList(), id);
+        } else {
+            orderItem.setActualQty(orderItem.getTotal());
+            orderItem.setDamageQty(0);
+            orderItem.setRemark("");
+            orderDamageService.deleteByItemId(id);
         }
         orderItemRepository.save(orderItem);
         orderService.updateProcess(orderItem.getReceivingOrderId());

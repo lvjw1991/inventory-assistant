@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,7 +15,6 @@ public interface ReceivingOrderItemRepository extends JpaRepository<ReceivingOrd
         JpaSpecificationExecutor<ReceivingOrderItem> {
 
     @Modifying
-    @Transactional
     @Query(value = "DELETE FROM receiving_order_item WHERE receiving_order_id = :orderId", nativeQuery = true)
     void deleteByOrderId(Long orderId);
 
