@@ -13,4 +13,6 @@ public interface SupplierProductRepository extends JpaRepository<SupplierProduct
     boolean existsBySupplierIdAndSupplierCodeAndBarcode(Long supplierId, String supplierCode, String barcode);
 
     List<SupplierProduct> findBySupplierIdAndSupplierCodeIn(Long supplierId, List<String> supplierCodes);
+
+    List<SupplierProduct> findBySupplierId(Long supplierId);
 }

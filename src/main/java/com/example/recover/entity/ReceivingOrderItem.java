@@ -32,4 +32,5 @@ public class ReceivingOrderItem extends BaseEntity {
     private Integer damageQty;
     private String remark;
     private Integer cartonQty;
+    private BigDecimal posPurchasePrice;
 }

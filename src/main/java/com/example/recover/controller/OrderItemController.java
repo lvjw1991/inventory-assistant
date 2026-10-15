@@ -6,6 +6,7 @@ import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.dto.OrderItemRequest;
 import com.example.recover.service.OrderItemService;
+import com.example.recover.utils.PriceCompareStyleHandler;
 import com.example.recover.vo.*;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -82,9 +83,10 @@ public class OrderItemController {
         response.setHeader("Content-Disposition", "attachment;filename=" +
                 URLEncoder.encode("货单列表.xlsx", StandardCharsets.UTF_8));
 
-        List<OrderItemVO> list = orderItemService.findAllByOrderId(orderId);
+        List<OrderItemExportVO> list = orderItemService.findAllByOrderId(orderId);
 
-        EasyExcel.write(response.getOutputStream(), OrderItemVO.class)
+        EasyExcel.write(response.getOutputStream(), OrderItemExportVO.class)
+                .registerWriteHandler(new PriceCompareStyleHandler(16))
                 .sheet("货单列表")
                 .doWrite(list);
     }

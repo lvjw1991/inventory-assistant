@@ -2,6 +2,7 @@ package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
 import com.example.recover.dto.BarcodeNameImgRow;
+import com.example.recover.dto.BarcodeNamePriceRow;
 import com.example.recover.dto.ProductRequest;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
@@ -53,6 +54,22 @@ class ProductServiceTests {
     void importProduct() {
         List<BarcodeNameImgRow> barcodeNameImgRows = readExcel("productImport.xlsx");
         ImportResultVO importResultVO = productService.dealWith(barcodeNameImgRows);
+        System.out.println("success" + importResultVO.getSuccess());
+        System.out.println("skip" + importResultVO.getSkip());
+    }
+
+    private List<BarcodeNamePriceRow> readPrice(String fileName) {
+        String path = "src/test/resources/" + fileName;
+        return EasyExcel.read(path)
+                .head(BarcodeNamePriceRow.class)
+                .sheet()
+                .doReadSync();
+    }
+
+    @Test
+    void importPrice() {
+        List<BarcodeNamePriceRow> barcodeNameImgRows = readPrice("price.xlsx");
+        ImportResultVO importResultVO = productService.dealWithPrice(barcodeNameImgRows);
         System.out.println("success" + importResultVO.getSuccess());
         System.out.println("skip" + importResultVO.getSkip());
     }

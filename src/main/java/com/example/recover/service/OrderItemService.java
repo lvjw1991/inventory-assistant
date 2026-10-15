@@ -14,7 +14,6 @@ import com.example.recover.vo.*;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -205,11 +204,9 @@ public class OrderItemService {
         return Result.success(true);
     }
 
-    public List<OrderItemVO> findAllByOrderId(Long orderId) {
-        ReceivingOrderItem orderItem = new ReceivingOrderItem();
-        orderItem.setReceivingOrderId(orderId);
-        Example<ReceivingOrderItem> example = Example.of(orderItem);
-        return orderItemRepository.findAll(example).stream().map(orderItemConverter::toVo).toList();
+    public List<OrderItemExportVO> findAllByOrderId(Long orderId) {
+        List<ReceivingOrderItem> byReceivingOrderId = orderItemRepository.findByReceivingOrderId(orderId);
+        return byReceivingOrderId.stream().map(orderItemConverter::toExportVo).toList();
     }
 
     public Result<PageResponse<OrderItemListMobileVO>> findAllByPage(OrderItemMobileQuery itemMobileQuery) {

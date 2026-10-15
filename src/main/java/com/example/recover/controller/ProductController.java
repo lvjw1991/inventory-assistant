@@ -63,8 +63,19 @@ public class ProductController {
         return productService.delete(id);
     }
 
+    /**
+     * 导入wolt图片
+     */
     @PostMapping("/import")
     public Result<ImportResultVO> importExcel(@RequestParam("file") MultipartFile file) throws IOException {
         return productService.importExcel(file);
+    }
+
+    /**
+     * 导入pos价格
+     */
+    @PostMapping("/import-price")
+    public Result<ImportResultVO> importPrice(@RequestParam("file") MultipartFile file) throws IOException {
+        return productService.importPrice(file);
     }
 }

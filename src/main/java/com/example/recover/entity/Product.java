@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "product")
 @Data
@@ -17,5 +19,6 @@ public class Product extends BaseEntity {
     private String barcode;
     private String imgUrl;
     private String category;
+    private BigDecimal purchasePrice;
 
 }

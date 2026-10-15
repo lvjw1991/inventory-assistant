@@ -7,6 +7,7 @@ import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
+import com.example.recover.utils.PriceCompareStyleHandler;
 import com.example.recover.vo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.apache.poi.ss.usermodel.*;
 
 @SpringBootTest
 @Transactional
@@ -70,12 +73,13 @@ class OrderItemServiceTests {
 
     @Test
     void export(){
-        Long orderId=10L;
-        List<OrderItemVO> allByOrderId = service.findAllByOrderId(orderId);
+        Long orderId = 21L;
+        List<OrderItemExportVO> allByOrderId = service.findAllByOrderId(orderId);
         // 写入本地文件
-        String path = "src/test/resources/export_" +
-                LocalDate.now() + ".xlsx";
-        EasyExcel.write(path, OrderItemVO.class)
+        String path = "src/test/resources/export_"
+                + LocalDate.now()+ ".xlsx";
+        EasyExcel.write(path, OrderItemExportVO.class)
+                 .registerWriteHandler(new PriceCompareStyleHandler(16))
                 .sheet("test")
                 .doWrite(allByOrderId);
     }

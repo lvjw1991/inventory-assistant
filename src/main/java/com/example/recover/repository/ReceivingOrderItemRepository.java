@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Repository
 public interface ReceivingOrderItemRepository extends JpaRepository<ReceivingOrderItem, Long>,
@@ -17,6 +19,8 @@ public interface ReceivingOrderItemRepository extends JpaRepository<ReceivingOrd
     @Transactional
     @Query(value = "DELETE FROM receiving_order_item WHERE receiving_order_id = :orderId", nativeQuery = true)
     void deleteByOrderId(Long orderId);
+
+    List<ReceivingOrderItem> findByReceivingOrderId(Long receivingOrderId);
 
 
 }

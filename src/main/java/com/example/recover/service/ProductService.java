@@ -1,6 +1,8 @@
 package com.example.recover.service;
 
 import com.example.recover.dto.BarcodeNameImgRow;
+import com.example.recover.dto.BarcodeNamePriceRow;
+import com.example.recover.exception.BusinessException;
 import com.example.recover.utils.ExcelUtils;
 import com.example.recover.vo.ImportResultVO;
 import com.example.recover.vo.PageResponse;
@@ -17,10 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -83,6 +83,7 @@ public class ProductService {
     }
 
     public ImportResultVO dealWith(List<BarcodeNameImgRow> rowList) {
+        checkWoltData(rowList);
         List<Product> all = productRepository.findAll();
         Map<String, Product> productMap = all.stream()
                 .collect(Collectors.toMap(Product::getBarcode, Function.identity()));
@@ -101,11 +102,8 @@ public class ProductService {
                     toInsert.setImgUrl(row.getImages());
                     toInsertList.add(toInsert);
                 }
-            } else if (!Objects.equals(existing.getName(), row.getName())
-                    || !Objects.equals(existing.getImgUrl(), row.getImages())) {
+            } else if (!Objects.equals(existing.getImgUrl(), row.getImages())) {
                 // update
-                existing.setBarcode(row.getGtin());
-                existing.setName(row.getName());
                 existing.setImgUrl(row.getImages());
                 toUpdateList.add(existing);
             }
@@ -115,5 +113,112 @@ public class ProductService {
         success = toInsertList.size() + toUpdateList.size();
         skip = rowList.size() - success;
         return new ImportResultVO(success, skip);
+    }
+
+    @Transactional
+    public Result<ImportResultVO> importPrice(MultipartFile file) throws IOException {
+        List<BarcodeNamePriceRow> rowList = ExcelUtils.read(file, BarcodeNamePriceRow.class);
+        ImportResultVO result = dealWithPrice(rowList);
+        return Result.success(result);
+    }
+
+    public ImportResultVO dealWithPrice(List<BarcodeNamePriceRow> rowList) {
+        checkPosData(rowList);
+        List<Product> all = productRepository.findAll();
+        Map<String, Product> productMap = all.stream()
+                .collect(Collectors.toMap(Product::getBarcode, Function.identity()));
+        List<Product> toInsertList = new ArrayList<>();
+        List<Product> toUpdateList = new ArrayList<>();
+        int success = 0, skip = 0;
+        for (BarcodeNamePriceRow row : rowList) {
+            Product existing = productMap.get(row.getBarcode());
+            if (existing == null) {
+                // new
+                if(StringUtils.isNotBlank(row.getBarcode()) && StringUtils.isNotBlank(row.getName())
+                        && Objects.nonNull(row.getPrice())){
+                    Product toInsert = new Product();
+                    toInsert.setBarcode(row.getBarcode());
+                    toInsert.setName(row.getName());
+                    toInsert.setPurchasePrice(row.getPrice());
+                    toInsertList.add(toInsert);
+                }
+            } else if (isPriceChanged(existing.getPurchasePrice(), row.getPrice())) {
+                // update
+                existing.setPurchasePrice(row.getPrice());
+                toUpdateList.add(existing);
+            }
+        }
+        productRepository.saveAll(toInsertList);
+        productRepository.saveAll(toUpdateList);
+        success = toInsertList.size() + toUpdateList.size();
+        skip = rowList.size() - success;
+        return new ImportResultVO(success, skip);
+    }
+
+    private void checkPosData(List<BarcodeNamePriceRow> rowList) {
+        Set<String> set = new HashSet<>();
+        Set<String> duplicateCodes = new LinkedHashSet<>();
+        List<Integer> emptyBarcodeRows = new ArrayList<>();
+
+        for (int i = 0; i < rowList.size(); i++) {
+            BarcodeNamePriceRow row = rowList.get(i);
+            String code = StringUtils.trimToNull(row.getBarcode());
+
+            if (code == null) {
+                emptyBarcodeRows.add(i + 2); // 假设 Excel 第 1 行是表头
+                continue;
+            }
+
+            if (!set.add(code)) {
+                duplicateCodes.add(code);
+            }
+        }
+
+        List<String> errors = new ArrayList<>();
+
+        if (!emptyBarcodeRows.isEmpty()) {
+            errors.add("空 Barcode 所在行：" + emptyBarcodeRows);
+        }
+
+        if (!duplicateCodes.isEmpty()) {
+            errors.add("重复 Barcode：" + duplicateCodes);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BusinessException(500, String.join("；", errors));
+        }
+    }
+
+    private boolean isPriceChanged(BigDecimal oldPrice, BigDecimal newPrice) {
+        return oldPrice == null
+                ? newPrice != null
+                : newPrice == null || oldPrice.compareTo(newPrice) != 0;
+    }
+
+    private void checkWoltData(List<BarcodeNameImgRow> rowList) {
+        Set<String> set = new HashSet<>();
+        Set<String> duplicateCodes = new LinkedHashSet<>();
+        List<Integer> emptyBarcodeRows = new ArrayList<>();
+        for (int i = 0; i < rowList.size(); i++) {
+            BarcodeNameImgRow row = rowList.get(i);
+            String code = StringUtils.trimToNull(row.getGtin());
+            if (code == null) {
+                emptyBarcodeRows.add(i + 2); // 假设 Excel 第 1 行是表头
+                continue;
+            }
+            if (!set.add(code)) {
+                duplicateCodes.add(code);
+            }
+        }
+        List<String> errors = new ArrayList<>();
+        if (!emptyBarcodeRows.isEmpty()) {
+            errors.add("空 Barcode 所在行：" + emptyBarcodeRows);
+        }
+        if (!duplicateCodes.isEmpty()) {
+            errors.add("重复 Barcode：" + duplicateCodes);
+        }
+        if (!errors.isEmpty()) {
+            throw new BusinessException(500, String.join("；", errors));
+        }
     }
 }
