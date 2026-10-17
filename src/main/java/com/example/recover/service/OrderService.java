@@ -104,6 +104,9 @@ public class OrderService {
     @Transactional(rollbackFor = Exception.class)
     public Result<ImportResultVO> importExcel(MultipartFile file, Long orderId) throws IOException {
         ReceivingOrder order = findEntityById(orderId);
+        if (order.getProgress().equals(OrderProcess.COMPLETED)) {
+            return Result.fail(500, "已完成点货");
+        }
         List<OrderItemRow> rows = ExcelUtils.read(file, OrderItemRow.class);
         ImportResultVO importResultVO = importOrderItems(rows, orderId, order.getSupplierId());
         updateProcess(order);
