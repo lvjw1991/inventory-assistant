@@ -63,16 +63,12 @@ public class ExpiryRecordService {
     }
 
     public ImportResultVO updateStock(List<BarcodeStockRow> rowList) {
-        Map<String, Integer> stockMap = null;
-        try {
-            stockMap = rowList.stream()
+        checkPosData(rowList);
+        Map<String, Integer> stockMap = rowList.stream()
                     .collect(Collectors.toMap(
                             BarcodeStockRow::getBarcode,
                             BarcodeStockRow::getStock
                     ));
-        } catch (IllegalStateException e) {
-            throw new BusinessException(500, "Excel 中存在重复 barcode");
-        }
         int success = 0, skip = 0;
         LocalDate start = LocalDate.now()
                 .plusMonths(1)
@@ -269,5 +265,39 @@ public class ExpiryRecordService {
         }
         expiryDateDetailVO.setAllDateList(expiryRecordRepository.findAllExpiryDates(barcode, LocalDate.now()));
         return Result.success(expiryDateDetailVO);
+    }
+
+    private void checkPosData(List<BarcodeStockRow> rowList) {
+        Set<String> set = new HashSet<>();
+        Set<String> duplicateCodes = new LinkedHashSet<>();
+        List<Integer> emptyBarcodeRows = new ArrayList<>();
+
+        for (int i = 0; i < rowList.size(); i++) {
+            BarcodeStockRow row = rowList.get(i);
+            String code = StringUtils.trimToNull(row.getBarcode());
+
+            if (code == null) {
+                emptyBarcodeRows.add(i + 2); // 假设 Excel 第 1 行是表头
+                continue;
+            }
+
+            if (!set.add(code)) {
+                duplicateCodes.add(code);
+            }
+        }
+
+        List<String> errors = new ArrayList<>();
+
+        if (!emptyBarcodeRows.isEmpty()) {
+            errors.add("空 Barcode 所在行：" + emptyBarcodeRows);
+        }
+
+        if (!duplicateCodes.isEmpty()) {
+            errors.add("重复 Barcode：" + duplicateCodes);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new BusinessException(500, String.join("；", errors));
+        }
     }
 }
