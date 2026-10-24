@@ -133,6 +133,7 @@ public class OrderItemService {
         orderItem.setDamageQty(request.getDamageQty());
         orderItem.setRemark(request.getRemark());
         orderItem.setCartonQty(request.getCartonQty());
+        orderItem.setOtherBoxQty(request.getOtherBoxQty());
         OrderItemVO vo = orderItemConverter.toVo(orderItemRepository.save(orderItem));
         //保存破损图片记录
         orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
@@ -163,6 +164,7 @@ public class OrderItemService {
         orderItem.setDamageQty(request.getDamageQty());
         orderItem.setRemark(request.getRemark());
         orderItem.setCartonQty(request.getCartonQty());
+        orderItem.setOtherBoxQty(request.getOtherBoxQty());
         //保存破损图片记录
         orderDamageService.upsert(request.getDamageImgList(), orderItem.getId());
         return Result.success(orderItemConverter.toVo(orderItemRepository.save(orderItem)));
@@ -192,16 +194,15 @@ public class OrderItemService {
         orderItem.setSugar(request.getSugar());
         orderItem.setCheckStatus(request.getStatus());
         orderItem.setTotal(request.getTotal());
+        orderItem.setRemark(request.getRemark());
         if(request.getStatus().equals(CheckStatus.FAIL)){
             orderItem.setActualQty(request.getActualQty());
             orderItem.setDamageQty(request.getDamageQty());
-            orderItem.setRemark(request.getRemark());
             //保存破损图片记录
             orderDamageService.upsert(request.getDamageImgList(), id);
         } else {
             orderItem.setActualQty(orderItem.getTotal());
             orderItem.setDamageQty(0);
-            orderItem.setRemark("");
             orderDamageService.deleteByItemId(id);
         }
         orderItemRepository.save(orderItem);

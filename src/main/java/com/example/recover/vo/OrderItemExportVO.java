@@ -59,4 +59,7 @@ public class OrderItemExportVO {
     @ExcelProperty("result")
     private String result;
 
+    @ExcelProperty("otherBoxQty")
+    private Integer otherBoxQty;
+
 }

@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
+import com.example.recover.entity.ReceivingOrderItem;
+import com.example.recover.repository.ReceivingOrderItemRepository;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.PriceCompareStyleHandler;
@@ -30,6 +32,9 @@ class OrderItemServiceTests {
 
     @Autowired
     private OrderItemService service;
+
+    @Autowired
+    private ReceivingOrderItemRepository orderItemRepository;
 
     @Test
     void page() {
@@ -73,7 +78,7 @@ class OrderItemServiceTests {
 
     @Test
     void export(){
-        Long orderId = 21L;
+        Long orderId = 24L;
         List<OrderItemExportVO> allByOrderId = service.findAllByOrderId(orderId);
         // 写入本地文件
         String path = "src/test/resources/export_"
@@ -87,19 +92,18 @@ class OrderItemServiceTests {
     @Test
     void checkAll(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Long orderId=5L;
-        OrderItemQuery orderItemQuery = new OrderItemQuery();
-        orderItemQuery.setOrderId(orderId);
-        Result<PageResponse<OrderItemListVO>> allByPage = service.findAllByPage(orderItemQuery);
-        List<OrderItemListVO> list = allByPage.getData().getList();
-        for (OrderItemListVO item : list){
-            if(item.getCheckStatus().equals(CheckStatus.UNCHECKED.name())) {
+        Long orderId=24L;
+        List<ReceivingOrderItem> byReceivingOrderId = orderItemRepository.findByReceivingOrderId(orderId);
+        for (ReceivingOrderItem item : byReceivingOrderId){
+            if(item.getCheckStatus().equals(CheckStatus.UNCHECKED)) {
                 // 简化的任意日期生成示例
                 int year = ThreadLocalRandom.current().nextInt(2027, 2031);
                 int month = ThreadLocalRandom.current().nextInt(1, 13);
                 // 动态获取月份天数，避免非法日期
                 int day = ThreadLocalRandom.current().nextInt(1, LocalDate.of(year, month, 1).lengthOfMonth() + 1);
                 OrderItemCheckRequest request = new OrderItemCheckRequest();
+                request.setRemark(item.getRemark());
+                request.setTotal(item.getTotal());
                 request.setStatus(CheckStatus.PASS);
                 request.setBarcode(UUID.randomUUID().toString());
                 request.setExpiryDate(List.of(LocalDate.of(year, month, day).format(formatter)));

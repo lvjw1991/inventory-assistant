@@ -138,6 +138,8 @@ public class OrderService {
             orderItem.setCategory(row.getCategory());
             orderItem.setCheckStatus(CheckStatus.UNCHECKED);
             orderItem.setCartonQty(row.getCartonQty());
+            orderItem.setOtherBoxQty(row.getOtherBoxQty());
+            orderItem.setRemark(row.getRemark());
             String barcode = StringUtils.trimToNull(row.getBarcode());
             if (barcode != null) {
                 // 优先使用 Excel 中的 Barcode

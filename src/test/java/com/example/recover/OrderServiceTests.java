@@ -42,7 +42,7 @@ class OrderServiceTests {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setReceiveDate(LocalDate.now());
         orderRequest.setNumber(1);
-        orderRequest.setSupplierId(14L);
+        orderRequest.setSupplierId(19L);
         orderRequest.setTransport("transport");
         orderRequest.setTemperature("temperature");
         Result<ReceivingOrderVO> receivingOrderResult = orderService.create(orderRequest);
@@ -51,7 +51,7 @@ class OrderServiceTests {
         Long orderId = data.getId();
         List<OrderItemRow> rows = readExcel("orderImport.xlsx");
 
-        ImportResultVO result = orderService.importOrderItems(rows, orderId, 14L);
+        ImportResultVO result = orderService.importOrderItems(rows, orderId, 19L);
         ReceivingOrder order = orderService.updateProcess(orderService.findEntityById(orderId));
 
         assertEquals("READY", order.getProgress().name());

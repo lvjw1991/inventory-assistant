@@ -30,6 +30,7 @@ public class OrderItemConverter {
         orderItemVO.setDamageQty(item.getDamageQty());
         orderItemVO.setRemark(item.getRemark());
         orderItemVO.setCartonQty(item.getCartonQty());
+        orderItemVO.setOtherBoxQty(item.getOtherBoxQty());
         return orderItemVO;
     }
 
@@ -60,6 +61,7 @@ public class OrderItemConverter {
 
         }
         orderItemVO.setResult(getPriceCompareResult(item));
+        orderItemVO.setOtherBoxQty(item.getOtherBoxQty());
         return orderItemVO;
     }
 

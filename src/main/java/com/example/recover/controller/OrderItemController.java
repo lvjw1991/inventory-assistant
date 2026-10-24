@@ -77,6 +77,12 @@ public class OrderItemController {
         return orderItemService.check(id, request);
     }
 
+    /**
+     * 导出
+     * @param orderId
+     * @param response
+     * @throws IOException
+     */
     @GetMapping("/export/{orderId}")
     public void export(@PathVariable Long orderId, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -91,6 +97,11 @@ public class OrderItemController {
                 .doWrite(list);
     }
 
+    /**
+     * 手机端列表
+     * @param query
+     * @return
+     */
     @GetMapping("/mobile")
     public Result<PageResponse<OrderItemListMobileVO>> search(OrderItemMobileQuery query) {
         return orderItemService.findAllByPage(query);

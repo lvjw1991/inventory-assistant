@@ -31,4 +31,10 @@ public class OrderItemRow {
 
     @ExcelProperty("barcode")
     private String barcode;
+
+    @ExcelProperty("otherBoxQty")
+    private Integer otherBoxQty;
+
+    @ExcelProperty("remark")
+    private String remark;
 }

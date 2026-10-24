@@ -43,4 +43,6 @@ public class OrderItemVO {
 
     private Integer cartonQty;
 
+    private Integer otherBoxQty;
+
 }
