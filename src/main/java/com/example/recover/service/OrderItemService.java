@@ -1,9 +1,6 @@
 package com.example.recover.service;
 
-import com.example.recover.dto.OrderItemCheckRequest;
-import com.example.recover.dto.OrderItemMobileQuery;
-import com.example.recover.dto.OrderItemQuery;
-import com.example.recover.dto.OrderItemRequest;
+import com.example.recover.dto.*;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ReceivingOrderItemRepository;
@@ -250,5 +247,13 @@ public class OrderItemService {
                 )
         );
         return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(listConverter::toMobileVo)));
+    }
+
+    public Result<PageResponse<OrderItemListBarcodeVO>> findAllByBarcode(OrderItemBarcodeQuery query) {
+        Pageable pageable = PageRequest.of(
+                query.getPageNum(),
+                query.getPageSize()
+        );
+        return Result.success(PageResponse.of(orderItemRepository.findAllByBarcode(query.getBarcode(), pageable)));
     }
 }

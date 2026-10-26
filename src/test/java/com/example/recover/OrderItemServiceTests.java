@@ -2,6 +2,7 @@ package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
+import com.example.recover.dto.OrderItemBarcodeQuery;
 import com.example.recover.dto.OrderItemCheckRequest;
 import com.example.recover.dto.OrderItemMobileQuery;
 import com.example.recover.dto.OrderItemQuery;
@@ -122,6 +123,16 @@ class OrderItemServiceTests {
         orderItemQuery.setKeyword("Kimchi");
         orderItemQuery.setCategory("Fresh");
         Result<PageResponse<OrderItemListMobileVO>> allByPage = service.findAllByPage(orderItemQuery);
+        System.out.println(JSON.toJSONString(allByPage));
+        assertEquals("success", allByPage.getMessage());
+
+    }
+
+    @Test
+    void pageBarcode() {
+        OrderItemBarcodeQuery orderItemQuery = new OrderItemBarcodeQuery();
+        orderItemQuery.setBarcode("3700417300027");
+        Result<PageResponse<OrderItemListBarcodeVO>> allByPage = service.findAllByBarcode(orderItemQuery);
         System.out.println(JSON.toJSONString(allByPage));
         assertEquals("success", allByPage.getMessage());
 

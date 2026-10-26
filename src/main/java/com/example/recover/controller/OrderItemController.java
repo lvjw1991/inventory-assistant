@@ -1,10 +1,7 @@
 package com.example.recover.controller;
 
 import com.alibaba.excel.EasyExcel;
-import com.example.recover.dto.OrderItemCheckRequest;
-import com.example.recover.dto.OrderItemMobileQuery;
-import com.example.recover.dto.OrderItemQuery;
-import com.example.recover.dto.OrderItemRequest;
+import com.example.recover.dto.*;
 import com.example.recover.service.OrderItemService;
 import com.example.recover.utils.PriceCompareStyleHandler;
 import com.example.recover.vo.*;
@@ -105,6 +102,14 @@ public class OrderItemController {
     @GetMapping("/mobile")
     public Result<PageResponse<OrderItemListMobileVO>> search(OrderItemMobileQuery query) {
         return orderItemService.findAllByPage(query);
+    }
+
+    /**
+     * 根据条形码查询货单分页
+     */
+    @GetMapping("/barcode")
+    public Result<PageResponse<OrderItemListBarcodeVO>> searchByBarcode(OrderItemBarcodeQuery query) {
+        return orderItemService.findAllByBarcode(query);
     }
 
 }
