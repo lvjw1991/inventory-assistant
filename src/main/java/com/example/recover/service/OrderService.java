@@ -141,19 +141,25 @@ public class OrderService {
             orderItem.setOtherBoxQty(row.getOtherBoxQty());
             orderItem.setRemark(row.getRemark());
             String barcode = StringUtils.trimToNull(row.getBarcode());
+            Product product = null;
+
             if (barcode != null) {
                 // 优先使用 Excel 中的 Barcode
                 orderItem.setBarcode(barcode);
-                Product product = barCodeProductMap.get(barcode);
-                if (product != null) {
-                    orderItem.setPosPurchasePrice(product.getPurchasePrice());
-                }
+                product = barCodeProductMap.get(barcode);
             } else {
                 // Excel Barcode 为空时，使用供应商编码映射
-                Product product = supplierCodeProductMap.get(row.getSupplierCode());
+                product = supplierCodeProductMap.get(row.getSupplierCode());
                 if (product != null) {
                     orderItem.setBarcode(product.getBarcode());
-                    orderItem.setPosPurchasePrice(product.getPurchasePrice());
+                }
+            }
+            if (product != null) {
+                orderItem.setPosPurchasePrice(product.getPurchasePrice());
+                // 仅当 Excel 没有提供类型时，才继承商品表类型
+                if (StringUtils.isBlank(row.getCategory())
+                        && StringUtils.isNotBlank(product.getCategory())) {
+                    orderItem.setCategory(product.getCategory());
                 }
             }
             orderItemList.add(orderItem);
@@ -187,7 +193,7 @@ public class OrderService {
         if (list.contains(CheckStatus.UNCHECKED)) {
             return Result.fail(500, "请先点货");
         }
-        updatePrice(orderItemList);
+        updatePriceAndCategory(orderItemList);
         supplierProductService.saveAll(orderItemList, order.getSupplierId());
         expiryRecordService.saveAll(orderItemList);
         order.setProgress(OrderProcess.COMPLETED);
@@ -294,8 +300,11 @@ public class OrderService {
         return supplierCodeProductMap;
     }
 
-    private void updatePrice(List<ReceivingOrderItem> orderItemList) {
+    private void updatePriceAndCategory(List<ReceivingOrderItem> orderItemList) {
         List<String> barcodeList = orderItemList.stream().map(ReceivingOrderItem::getBarcode).distinct().toList();
+        if (barcodeList.isEmpty()) {
+            return;
+        }
         Map<String, Product> barCodeData = getBarCodeData(barcodeList);
         List<ReceivingOrderItem> updateList = new ArrayList<>();
         for (ReceivingOrderItem item : orderItemList) {
@@ -304,12 +313,29 @@ public class OrderService {
                 continue;
             }
             Product product = barCodeData.get(barcode);
-            if (product == null || product.getPurchasePrice() == null) {
+            if (product == null) {
                 continue;
             }
-            if (item.getPosPurchasePrice() == null
-                    || item.getPosPurchasePrice().compareTo(product.getPurchasePrice()) != 0) {
+
+            boolean changed = false;
+
+            // 更新进价：商品表进价不为空时，以商品表为准
+            if (product.getPurchasePrice() != null
+                    && (item.getPosPurchasePrice() == null
+                    || item.getPosPurchasePrice()
+                    .compareTo(product.getPurchasePrice()) != 0)) {
                 item.setPosPurchasePrice(product.getPurchasePrice());
+                changed = true;
+            }
+
+            // 更新类型：仅补充明细中为空的类型，不覆盖已有类型
+            if (StringUtils.isBlank(item.getCategory())
+                    && StringUtils.isNotBlank(product.getCategory())) {
+                item.setCategory(product.getCategory());
+                changed = true;
+            }
+
+            if (changed) {
                 updateList.add(item);
             }
         }

@@ -1,17 +1,23 @@
 package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson2.JSON;
 import com.example.recover.dto.BarcodeNameImgRow;
 import com.example.recover.dto.BarcodeNamePriceRow;
+import com.example.recover.dto.ProductCategoryBatchRequest;
 import com.example.recover.dto.ProductRequest;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
+import com.example.recover.utils.CategoryStatus;
 import com.example.recover.vo.ImportResultVO;
+import com.example.recover.vo.PageResponse;
+import com.example.recover.vo.ProductCategoryItemVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -72,6 +78,24 @@ class ProductServiceTests {
         ImportResultVO importResultVO = productService.dealWithPrice(barcodeNameImgRows);
         System.out.println("success" + importResultVO.getSuccess());
         System.out.println("skip" + importResultVO.getSkip());
+    }
+
+    @Test
+    void query(){
+        PageResponse<ProductCategoryItemVO> query = productService.query(0, 10, "",
+                CategoryStatus.ALL);
+        System.out.println(JSON.toJSONString(query));
+    }
+
+    @Test
+    void batch(){
+        ProductCategoryBatchRequest productCategoryBatchRequest = new ProductCategoryBatchRequest();
+        List<Long> productIds = new ArrayList<>();
+        productIds.add(11598L);
+        productIds.add(11608L);
+        productCategoryBatchRequest.setProductIds(productIds);
+        productCategoryBatchRequest.setCategory("NF");
+        productService.batchUpdate(productCategoryBatchRequest);
     }
 
 }

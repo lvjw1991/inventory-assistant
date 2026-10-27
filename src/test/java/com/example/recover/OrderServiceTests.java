@@ -42,7 +42,7 @@ class OrderServiceTests {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setReceiveDate(LocalDate.now());
         orderRequest.setNumber(1);
-        orderRequest.setSupplierId(19L);
+        orderRequest.setSupplierId(18L);
         orderRequest.setTransport("transport");
         orderRequest.setTemperature("temperature");
         Result<ReceivingOrderVO> receivingOrderResult = orderService.create(orderRequest);
@@ -59,7 +59,7 @@ class OrderServiceTests {
 
     @Test
     void complete(){
-        Result<Boolean> complete = orderService.complete(5L);
+        Result<Boolean> complete = orderService.complete(24L);
         assertEquals("success", complete.getMessage());
     }
 

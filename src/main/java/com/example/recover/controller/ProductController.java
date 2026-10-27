@@ -1,8 +1,11 @@
 package com.example.recover.controller;
 
+import com.example.recover.dto.ProductCategoryBatchRequest;
+import com.example.recover.utils.CategoryStatus;
 import com.example.recover.vo.ImportResultVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.dto.ProductRequest;
+import com.example.recover.vo.ProductCategoryItemVO;
 import com.example.recover.vo.Result;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
@@ -78,4 +81,29 @@ public class ProductController {
     public Result<ImportResultVO> importPrice(@RequestParam("file") MultipartFile file) throws IOException {
         return productService.importPrice(file);
     }
+
+    @GetMapping("/category-management")
+    public Result<PageResponse<ProductCategoryItemVO>> query(
+            @RequestParam(defaultValue = "0") int pageNum,
+            @RequestParam(defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "UNCLASSIFIED")
+            CategoryStatus categoryStatus
+    ) {
+        return Result.success(productService.query(
+                pageNum,
+                pageSize,
+                keyword,
+                categoryStatus
+        ));
+    }
+
+    @PatchMapping("/category/batch")
+    public Result<Boolean> batchUpdate(
+            @Valid @RequestBody ProductCategoryBatchRequest request
+    ) {
+        productService.batchUpdate(request);
+        return Result.success(true);
+    }
+
 }

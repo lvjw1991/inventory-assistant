@@ -2,11 +2,14 @@ package com.example.recover.service;
 
 import com.example.recover.dto.BarcodeNameImgRow;
 import com.example.recover.dto.BarcodeNamePriceRow;
+import com.example.recover.dto.ProductCategoryBatchRequest;
 import com.example.recover.exception.BusinessException;
+import com.example.recover.utils.CategoryStatus;
 import com.example.recover.utils.ExcelUtils;
 import com.example.recover.vo.ImportResultVO;
 import com.example.recover.vo.PageResponse;
 import com.example.recover.dto.ProductRequest;
+import com.example.recover.vo.ProductCategoryItemVO;
 import com.example.recover.vo.Result;
 import com.example.recover.entity.Product;
 import com.example.recover.exception.ResourceNotFoundException;
@@ -14,6 +17,7 @@ import com.example.recover.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +33,17 @@ import java.util.stream.Collectors;
 public class ProductService {
 
     private final ProductRepository productRepository;
+
+    private static final Set<String> ALLOWED_CATEGORIES = Set.of(
+            "Fresh",
+            "Frozen",
+            "Dry",
+            "Seasoning",
+            "Drink",
+            "Instant Noodle",
+            "Snack",
+            "NF"
+    );
 
 
     public Result<PageResponse<Product>> findAllByPage(int pageNum, int pageSize) {
@@ -220,5 +235,67 @@ public class ProductService {
         if (!errors.isEmpty()) {
             throw new BusinessException(500, String.join("；", errors));
         }
+    }
+
+    public PageResponse<ProductCategoryItemVO> query(
+            int pageNum,
+            int pageSize,
+            String keyword,
+            CategoryStatus categoryStatus
+    ) {
+        if (pageNum < 0) {
+            throw new IllegalArgumentException("pageNum must be >= 0");
+        }
+
+        if (pageSize < 1 || pageSize > 200) {
+            throw new IllegalArgumentException(
+                    "pageSize must be between 1 and 200"
+            );
+        }
+
+        CategoryStatus status = categoryStatus == null
+                ? CategoryStatus.UNCLASSIFIED
+                : categoryStatus;
+
+        String normalizedKeyword =
+                keyword == null || keyword.isBlank()
+                        ? null
+                        : keyword.trim();
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize);
+
+        return PageResponse.of(productRepository.findForCategoryManagement(
+                status.name(),
+                normalizedKeyword,
+                pageable
+        ));
+    }
+
+    @Transactional
+    public void batchUpdate(
+            ProductCategoryBatchRequest request
+    ) {
+        List<Long> productIds = request.getProductIds().stream()
+                .distinct()
+                .toList();
+
+        if (productIds.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "productIds cannot be empty"
+            );
+        }
+
+        String category = request.getCategory().trim();
+
+        if (!ALLOWED_CATEGORIES.contains(category)) {
+            throw new IllegalArgumentException(
+                    "Unsupported product category: " + category
+            );
+        }
+
+        productRepository.updateCategoryByIds(
+                productIds,
+                category
+        );
     }
 }
