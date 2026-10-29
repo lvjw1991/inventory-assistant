@@ -85,6 +85,9 @@ public class SecurityConfig {
                         // 用户管理：ADMIN
                         .requestMatchers("/api/user/**")
                         .hasRole("ADMIN")
+                        // 订货管理：ADMIN
+                        .requestMatchers("/api/purchase-recommendations/**")
+                        .hasRole("ADMIN")
                         // 其余接口需要登录
                         .anyRequest().authenticated())
                 .exceptionHandling(ex -> ex
