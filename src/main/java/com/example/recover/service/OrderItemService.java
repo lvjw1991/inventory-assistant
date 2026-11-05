@@ -93,8 +93,8 @@ public class OrderItemService {
         };
         Pageable pageable = PageRequest.of(itemQuery.getPageNum(), itemQuery.getPageSize(),
                 Sort.by(
-                        Sort.Direction.ASC,
-                        "expiryDate"
+                        Sort.Order.asc("expiryDate"),
+                        Sort.Order.asc("id")
                 )
         );
         return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(listConverter::toVo)));
@@ -242,8 +242,8 @@ public class OrderItemService {
         };
         Pageable pageable = PageRequest.of(itemMobileQuery.getPageNum(), itemMobileQuery.getPageSize(),
                 Sort.by(
-                        Sort.Direction.ASC,
-                        "expiryDate"
+                        Sort.Order.asc("expiryDate"),
+                        Sort.Order.asc("id")
                 )
         );
         return Result.success(PageResponse.of(orderItemRepository.findAll(spec, pageable).map(listConverter::toMobileVo)));
