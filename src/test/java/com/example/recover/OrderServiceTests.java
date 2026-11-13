@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.OrderItemRow;
 import com.example.recover.dto.OrderQuery;
 import com.example.recover.dto.OrderRequest;
+import com.example.recover.entity.Product;
 import com.example.recover.entity.ReceivingOrder;
 import com.example.recover.service.OrderService;
 import com.example.recover.vo.ImportResultVO;
@@ -72,6 +73,14 @@ class OrderServiceTests {
         System.out.println(JSON.toJSONString(allByPage));
         assertEquals("success", allByPage.getMessage());
 
+    }
+
+    @Test
+    void findProduct(){
+        long orderId=29L;
+        Result<List<Product>> productListByOrderId = orderService.findProductListByOrderId(orderId);
+        System.out.println(JSON.toJSONString(productListByOrderId));
+        assertEquals("success", productListByOrderId.getMessage());
     }
 
 }

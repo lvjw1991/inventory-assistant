@@ -1,5 +1,6 @@
 package com.example.recover.entity;
 
+import com.example.recover.utils.NetUnitType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,4 +22,9 @@ public class Product extends BaseEntity {
     private String category;
     private BigDecimal purchasePrice;
 
+    private BigDecimal salePrice;
+    private String nameFi;
+    private BigDecimal netContent;
+    @Enumerated(EnumType.STRING)
+    private NetUnitType netUnit;
 }

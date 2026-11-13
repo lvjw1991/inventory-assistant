@@ -9,9 +9,7 @@ import com.example.recover.dto.ProductRequest;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
 import com.example.recover.utils.CategoryStatus;
-import com.example.recover.vo.ImportResultVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.vo.ProductCategoryItemVO;
+import com.example.recover.vo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -97,5 +95,16 @@ class ProductServiceTests {
         productCategoryBatchRequest.setCategory("NF");
         productService.batchUpdate(productCategoryBatchRequest);
     }
+
+    @Test
+    void findTagList(){
+        List<Long> productIds = new ArrayList<>();
+        productIds.add(2657L);
+        productIds.add(2658L);
+        Result<List<PriceTagVO>> tagList = productService.findTagList(productIds);
+        System.out.println(JSON.toJSONString(tagList));
+        assertEquals("success", tagList.getMessage());
+    }
+
 
 }

@@ -17,4 +17,15 @@ public class BarcodeNamePriceRow {
     @ExcelProperty("KESKIHINTA")
     private BigDecimal price;
 
+    @ExcelProperty("HINTA")
+    private BigDecimal salePrice;
+
+    @ExcelProperty("NIMI2")
+    private String nameFi;
+
+    @ExcelProperty("hryksikko")
+    private String netUnit;
+
+    @ExcelProperty("HRKERROIN")
+    private BigDecimal netContent;
 }

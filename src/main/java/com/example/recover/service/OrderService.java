@@ -343,4 +343,14 @@ public class OrderService {
             orderItemRepository.saveAll(updateList);
         }
     }
+
+    public Result<List<Product>> findProductListByOrderId(Long orderId) {
+        ReceivingOrder order = findEntityById(orderId);
+        if (!order.getProgress().equals(OrderProcess.COMPLETED)) {
+            return Result.fail(500, "必须选择已完成点货");
+        }
+        List<ReceivingOrderItem> orderItemList = orderItemRepository.findByReceivingOrderId(orderId);
+        List<String> barcodeList = orderItemList.stream().map(ReceivingOrderItem::getBarcode).distinct().toList();
+        return Result.success(productRepository.findByBarcodeIn(barcodeList));
+    }
 }

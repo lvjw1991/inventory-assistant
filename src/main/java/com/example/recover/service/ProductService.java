@@ -1,16 +1,12 @@
 package com.example.recover.service;
 
-import com.example.recover.dto.BarcodeNameImgRow;
-import com.example.recover.dto.BarcodeNamePriceRow;
-import com.example.recover.dto.ProductCategoryBatchRequest;
+import com.example.recover.dto.*;
 import com.example.recover.exception.BusinessException;
 import com.example.recover.utils.CategoryStatus;
 import com.example.recover.utils.ExcelUtils;
-import com.example.recover.vo.ImportResultVO;
-import com.example.recover.vo.PageResponse;
-import com.example.recover.dto.ProductRequest;
-import com.example.recover.vo.ProductCategoryItemVO;
-import com.example.recover.vo.Result;
+import com.example.recover.utils.NetUnitType;
+import com.example.recover.utils.PriceTagConverter;
+import com.example.recover.vo.*;
 import com.example.recover.entity.Product;
 import com.example.recover.exception.ResourceNotFoundException;
 import com.example.recover.repository.ProductRepository;
@@ -44,6 +40,8 @@ public class ProductService {
             "Snack",
             "NF"
     );
+
+    private final PriceTagConverter priceTagConverter;
 
 
     public Result<PageResponse<Product>> findAllByPage(int pageNum, int pageSize) {
@@ -155,11 +153,22 @@ public class ProductService {
                     toInsert.setBarcode(row.getBarcode());
                     toInsert.setName(row.getName());
                     toInsert.setPurchasePrice(row.getPrice());
+                    toInsert.setSalePrice(row.getSalePrice());
+                    toInsert.setNameFi(row.getNameFi());
+                    toInsert.setNetContent(dealWithContent(row.getNetContent()));
+                    toInsert.setNetUnit(dealWithUnit(row.getNetUnit()));
                     toInsertList.add(toInsert);
                 }
-            } else if (isPriceChanged(existing.getPurchasePrice(), row.getPrice())) {
+            } else if (isPriceChanged(existing.getPurchasePrice(), row.getPrice()) ||
+                    isPriceChanged(existing.getSalePrice(), row.getSalePrice())) {
                 // update
                 existing.setPurchasePrice(row.getPrice());
+                existing.setSalePrice(row.getSalePrice());
+                //FIXME 初始化使用 start
+                existing.setNameFi(row.getNameFi());
+                existing.setNetContent(dealWithContent(row.getNetContent()));
+                existing.setNetUnit(dealWithUnit(row.getNetUnit()));
+                //FIXME 初始化使用 end
                 toUpdateList.add(existing);
             }
         }
@@ -168,6 +177,26 @@ public class ProductService {
         success = toInsertList.size() + toUpdateList.size();
         skip = rowList.size() - success;
         return new ImportResultVO(success, skip);
+    }
+
+    //空单位转 null，单位统一转换为枚举
+    private NetUnitType dealWithUnit(String netUnit) {
+        if(StringUtils.isBlank(netUnit)){
+            return null;
+        }
+        if(netUnit.equals("kg") || netUnit.equals("KG") || netUnit.equals("l")
+        || netUnit.equals("L") || netUnit.equals("KPL") || netUnit.equals("kpl")) {
+            return NetUnitType.valueOf(netUnit.trim().toUpperCase(Locale.ROOT));
+        }
+        return null;
+    }
+
+    //净含量为 0 时转 null
+    private BigDecimal dealWithContent(BigDecimal netContent) {
+        if(netContent == null || netContent.compareTo(BigDecimal.ZERO) <= 0){
+            return null;
+        }
+        return netContent;
     }
 
     private void checkPosData(List<BarcodeNamePriceRow> rowList) {
@@ -297,5 +326,21 @@ public class ProductService {
                 productIds,
                 category
         );
+    }
+
+    public Result<List<PriceTagVO>> findTagList(List<Long> idList) {
+        List<Product> allById = productRepository.findAllById(idList);
+        return Result.success(allById.stream().map(priceTagConverter::toVO).toList());
+    }
+
+    public Result<PriceTagVO> updatePriceTag(PriceTagRequest request) {
+        Product product = findById(request.getId()).getData();
+        product.setSalePrice(request.getSalePrice());
+        product.setNameFi(request.getNameFi());
+        product.setName(request.getName());
+        product.setNetUnit(request.getNetUnit());
+        product.setNetContent(request.getNetContent());
+        Product save = productRepository.save(product);
+        return Result.success(priceTagConverter.toVO(save));
     }
 }
