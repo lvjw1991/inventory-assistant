@@ -184,8 +184,7 @@ public class ProductService {
         if(StringUtils.isBlank(netUnit)){
             return null;
         }
-        if(netUnit.equals("kg") || netUnit.equals("KG") || netUnit.equals("l")
-        || netUnit.equals("L") || netUnit.equals("KPL") || netUnit.equals("kpl")) {
+        if(netUnit.equals("kg") || netUnit.equals("KG") || netUnit.equals("l") || netUnit.equals("L") ) {
             return NetUnitType.valueOf(netUnit.trim().toUpperCase(Locale.ROOT));
         }
         return null;

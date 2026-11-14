@@ -71,6 +71,9 @@ public class SecurityConfig {
                         // 有效期：ADMIN + STAFF
                         .requestMatchers("/api/records/**")
                         .hasAnyRole("ADMIN", "STAFF")
+                        //价签打印：ADMIN + STAFF
+                        .requestMatchers("/api/tags/**")
+                        .hasAnyRole("ADMIN", "STAFF")
                         // 供应商：查询可以给 STAFF，增删改只有 ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/suppliers/**")
                         .hasAnyRole("ADMIN", "STAFF")

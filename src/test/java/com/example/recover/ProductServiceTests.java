@@ -2,19 +2,18 @@ package com.example.recover;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson2.JSON;
-import com.example.recover.dto.BarcodeNameImgRow;
-import com.example.recover.dto.BarcodeNamePriceRow;
-import com.example.recover.dto.ProductCategoryBatchRequest;
-import com.example.recover.dto.ProductRequest;
+import com.example.recover.dto.*;
 import com.example.recover.entity.Product;
 import com.example.recover.service.ProductService;
 import com.example.recover.utils.CategoryStatus;
+import com.example.recover.utils.NetUnitType;
 import com.example.recover.vo.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,5 +105,19 @@ class ProductServiceTests {
         assertEquals("success", tagList.getMessage());
     }
 
+    @Test
+    void updatePriceTag(){
+        PriceTagRequest priceTagRequest = new PriceTagRequest();
+        priceTagRequest.setId(2657L);
+        priceTagRequest.setSalePrice(new BigDecimal("4.5"));
+        priceTagRequest.setName("Taihe natto zanmai 167,4g");
+        priceTagRequest.setNameFi("Taihei natto zanmai 167.4g");
+        priceTagRequest.setNetContent(new BigDecimal("0.167"));
+        priceTagRequest.setNetUnit(NetUnitType.KG);
+        Result<PriceTagVO> priceTagVOResult = productService.updatePriceTag(priceTagRequest);
+        System.out.println(JSON.toJSONString(priceTagVOResult));
+        assertEquals("success", priceTagVOResult.getMessage());
+
+    }
 
 }

@@ -26,8 +26,8 @@ public class PriceTagController {
         return orderService.findProductListByOrderId(orderId);
     }
 
-    @GetMapping("/items")
-    public Result<List<PriceTagVO>> findTagList(List<Long> idList) {
+    @PostMapping("/items")
+    public Result<List<PriceTagVO>> findTagList(@RequestBody List<Long> idList) {
         return productService.findTagList(idList);
     }
 
