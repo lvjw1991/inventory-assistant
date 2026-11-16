@@ -18,5 +18,7 @@ public class PriceTagRequest {
     private String nameFi;
     private BigDecimal netContent;
     private NetUnitType netUnit;
+    @NotBlank(message = "img不能为空")
+    private String imgUrl;
 
 }

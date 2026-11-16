@@ -164,11 +164,6 @@ public class ProductService {
                 // update
                 existing.setPurchasePrice(row.getPrice());
                 existing.setSalePrice(row.getSalePrice());
-                //FIXME 初始化使用 start
-                existing.setNameFi(row.getNameFi());
-                existing.setNetContent(dealWithContent(row.getNetContent()));
-                existing.setNetUnit(dealWithUnit(row.getNetUnit()));
-                //FIXME 初始化使用 end
                 toUpdateList.add(existing);
             }
         }
@@ -339,6 +334,7 @@ public class ProductService {
         product.setName(request.getName());
         product.setNetUnit(request.getNetUnit());
         product.setNetContent(request.getNetContent());
+        product.setImgUrl(request.getImgUrl());
         Product save = productRepository.save(product);
         return Result.success(priceTagConverter.toVO(save));
     }

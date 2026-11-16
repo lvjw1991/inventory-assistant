@@ -114,6 +114,7 @@ class ProductServiceTests {
         priceTagRequest.setNameFi("Taihei natto zanmai 167.4g");
         priceTagRequest.setNetContent(new BigDecimal("0.167"));
         priceTagRequest.setNetUnit(NetUnitType.KG);
+        priceTagRequest.setImgUrl("https://imageproxy.wolt.com/assets/68839d5602a50c046d1a2384");
         Result<PriceTagVO> priceTagVOResult = productService.updatePriceTag(priceTagRequest);
         System.out.println(JSON.toJSONString(priceTagVOResult));
         assertEquals("success", priceTagVOResult.getMessage());
