@@ -121,4 +121,12 @@ class ProductServiceTests {
 
     }
 
+    @Test
+    void findByCode(){
+        String barcode="1222";
+        Result<Product> byBarcode = productService.getByBarcode(barcode);
+        System.out.println(JSON.toJSONString(byBarcode));
+        assertEquals("success", byBarcode.getMessage());
+    }
+
 }

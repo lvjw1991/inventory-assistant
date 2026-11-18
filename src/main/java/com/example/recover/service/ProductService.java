@@ -338,4 +338,12 @@ public class ProductService {
         Product save = productRepository.save(product);
         return Result.success(priceTagConverter.toVO(save));
     }
+
+    public Result<Product> getByBarcode(String barcode) {
+        Product byBarcode = productRepository.findByBarcode(barcode);
+        if(byBarcode == null){
+            return Result.fail(404, "商品不存在");
+        }
+        return Result.success(byBarcode);
+    }
 }

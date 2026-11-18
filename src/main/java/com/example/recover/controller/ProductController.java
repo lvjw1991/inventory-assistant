@@ -106,4 +106,9 @@ public class ProductController {
         return Result.success(true);
     }
 
+    @GetMapping("/by-barcode")
+    public Result<Product> getByBarcode(@RequestParam String barcode) {
+        return productService.getByBarcode(barcode);
+    }
+
 }

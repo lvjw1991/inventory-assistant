@@ -83,6 +83,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/codes/**")
                         .hasRole("ADMIN")
                         // 商品管理：ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/products/**")
+                        .hasAnyRole("ADMIN", "STAFF")
                         .requestMatchers("/api/products/**")
                         .hasRole("ADMIN")
                         // 用户管理：ADMIN
