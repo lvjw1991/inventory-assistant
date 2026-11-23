@@ -37,4 +37,7 @@ public class OrderItemRow {
 
     @ExcelProperty("remark")
     private String remark;
+
+    @ExcelProperty("date")
+    private String date;
 }

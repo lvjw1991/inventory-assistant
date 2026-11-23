@@ -1,5 +1,6 @@
 package com.example.recover;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSON;
 import com.example.recover.dto.*;
 import com.example.recover.entity.Supplier;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,7 +76,8 @@ public class SupplierServiceTest {
 
     @Test
     void find2() {
-        Result<PageResponse<SupplierProduct>> allByPage = service.findAllByPage(0, 10, null);
+        Result<PageResponse<SupplierProduct>> allByPage = service.findAllByPage(0, 10,
+                null,"05.185.020");
         System.out.println(JSON.toJSONString(allByPage));
         List<SupplierProduct> list = allByPage.getData().getList();
         if (list != null) {
@@ -82,5 +85,16 @@ public class SupplierServiceTest {
             Result<SupplierProduct> byId = service.findById(first.getId());
             assertEquals(200, byId.getCode());
         }
+    }
+
+    @Test
+    void export(){
+        List<SupplierProduct> allByOrderId = service.findAllBy(13L, null);
+        // 写入本地文件
+        String path = "src/test/resources/export_"
+                + LocalDate.now()+ ".xlsx";
+        EasyExcel.write(path, SupplierProduct.class)
+                .sheet("test")
+                .doWrite(allByOrderId);
     }
 }

@@ -140,6 +140,7 @@ public class OrderService {
             orderItem.setCartonQty(row.getCartonQty());
             orderItem.setOtherBoxQty(row.getOtherBoxQty());
             orderItem.setRemark(row.getRemark());
+            orderItem.setExpiryDate(row.getDate());
             String barcode = StringUtils.trimToNull(row.getBarcode());
             Product product = null;
 

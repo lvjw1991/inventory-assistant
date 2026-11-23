@@ -48,9 +48,10 @@ public class SupplierProductService {
         return Result.success(true);
     }
 
-    public Result<PageResponse<SupplierProduct>> findAllByPage(int pageNum, int pageSize, Long supplierId) {
+    public Result<PageResponse<SupplierProduct>> findAllByPage(int pageNum, int pageSize, Long supplierId, String supplierCode) {
         SupplierProduct supplierProduct = new SupplierProduct();
         supplierProduct.setSupplierId(supplierId);
+        supplierProduct.setSupplierCode(supplierCode);
         Example<SupplierProduct> example = Example.of(supplierProduct);
         Pageable pageable = PageRequest.of(
                 pageNum,
@@ -102,4 +103,11 @@ public class SupplierProductService {
         }
     }
 
+    public List<SupplierProduct> findAllBy(Long supplierId, String supplierCode) {
+        SupplierProduct supplierProduct = new SupplierProduct();
+        supplierProduct.setSupplierId(supplierId);
+        supplierProduct.setSupplierCode(supplierCode);
+        Example<SupplierProduct> example = Example.of(supplierProduct);
+        return supplierProductRepository.findAll(example);
+    }
 }
