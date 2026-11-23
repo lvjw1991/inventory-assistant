@@ -171,7 +171,7 @@ public class OrderService {
     }
 
     /**
-     * 1. 根据barcode更新进价
+     * 1. 根据barcode更新进价-前置到每次点货
      * 2. 保存 supplier_product（不存在则新增）
      * 3. 保存 expiry_record（不存在则新增）
      *
@@ -194,7 +194,7 @@ public class OrderService {
         if (list.contains(CheckStatus.UNCHECKED)) {
             return Result.fail(500, "请先点货");
         }
-        updatePriceAndCategory(orderItemList);
+        //updatePriceAndCategory(orderItemList);
         supplierProductService.saveAll(orderItemList, order.getSupplierId());
         expiryRecordService.saveAll(orderItemList);
         order.setProgress(OrderProcess.COMPLETED);

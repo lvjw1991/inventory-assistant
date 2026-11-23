@@ -1,8 +1,10 @@
 package com.example.recover.service;
 
 import com.example.recover.dto.*;
+import com.example.recover.entity.Product;
 import com.example.recover.entity.ReceivingOrderItem;
 import com.example.recover.exception.ResourceNotFoundException;
+import com.example.recover.repository.ProductRepository;
 import com.example.recover.repository.ReceivingOrderItemRepository;
 import com.example.recover.utils.CheckStatus;
 import com.example.recover.utils.OrderItemConverter;
@@ -34,6 +36,8 @@ public class OrderItemService {
     private final OrderDamageService orderDamageService;
 
     private final OrderItemListConverter listConverter;
+
+    private final ProductRepository productRepository;
 
     public Result<PageResponse<OrderItemListVO>> findAllByPage(OrderItemQuery itemQuery) {
         Specification<ReceivingOrderItem> spec = (root, query, cb) -> {
@@ -192,6 +196,11 @@ public class OrderItemService {
         orderItem.setCheckStatus(request.getStatus());
         orderItem.setTotal(request.getTotal());
         orderItem.setRemark(request.getRemark());
+        //更新进价
+        Product byBarcode = productRepository.findByBarcode(request.getBarcode());
+        if (byBarcode != null) {
+            orderItem.setPosPurchasePrice(byBarcode.getPurchasePrice());
+        }
         if(request.getStatus().equals(CheckStatus.FAIL)){
             orderItem.setActualQty(request.getActualQty());
             orderItem.setDamageQty(request.getDamageQty());
