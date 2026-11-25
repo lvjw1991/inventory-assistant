@@ -12,6 +12,7 @@ import com.example.recover.utils.OrderItemListConverter;
 import com.example.recover.vo.*;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -264,5 +269,63 @@ public class OrderItemService {
                 query.getPageSize()
         );
         return Result.success(PageResponse.of(orderItemRepository.findAllByBarcode(query.getBarcode(), pageable)));
+    }
+
+    @Transactional
+    public void updatePriceByOrderId(Long orderId) {
+        List<ReceivingOrderItem> byReceivingOrderId = orderItemRepository.findByReceivingOrderId(orderId);
+        updatePrice(byReceivingOrderId);
+    }
+
+    private void updatePrice(List<ReceivingOrderItem> orderItemList) {
+        List<String> barcodeList = orderItemList.stream().map(ReceivingOrderItem::getBarcode).distinct().toList();
+        if (barcodeList.isEmpty()) {
+            return;
+        }
+        Map<String, Product> barCodeData = getBarCodeData(barcodeList);
+        List<ReceivingOrderItem> updateList = new ArrayList<>();
+        for (ReceivingOrderItem item : orderItemList) {
+            String barcode = StringUtils.trimToNull(item.getBarcode());
+            if (barcode == null) {
+                continue;
+            }
+            Product product = barCodeData.get(barcode);
+            if (product == null) {
+                continue;
+            }
+
+            boolean changed = false;
+
+            // 更新进价：商品表进价不为空时，以商品表为准
+            if (product.getPurchasePrice() != null
+                    && (item.getPosPurchasePrice() == null
+                    || item.getPosPurchasePrice()
+                    .compareTo(product.getPurchasePrice()) != 0)) {
+                item.setPosPurchasePrice(product.getPurchasePrice());
+                changed = true;
+            }
+
+            if (changed) {
+                updateList.add(item);
+            }
+        }
+        if (!updateList.isEmpty()) {
+            orderItemRepository.saveAll(updateList);
+        }
+    }
+
+    private Map<String, Product> getBarCodeData(List<String> barcodeList) {
+        if (barcodeList == null || barcodeList.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<Product> byBarcodeIn = productRepository.findByBarcodeIn(barcodeList);
+        // Barcode -> Product
+        return  byBarcodeIn.stream()
+                .filter(p -> p.getBarcode() != null)
+                .collect(Collectors.toMap(
+                        Product::getBarcode,
+                        Function.identity(),
+                        (a, b) -> a
+                ));
     }
 }

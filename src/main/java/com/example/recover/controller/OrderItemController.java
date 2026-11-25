@@ -85,7 +85,7 @@ public class OrderItemController {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader("Content-Disposition", "attachment;filename=" +
                 URLEncoder.encode("货单列表.xlsx", StandardCharsets.UTF_8));
-
+        orderItemService.updatePriceByOrderId(orderId);
         List<OrderItemExportVO> list = orderItemService.findAllByOrderId(orderId);
 
         EasyExcel.write(response.getOutputStream(), OrderItemExportVO.class)

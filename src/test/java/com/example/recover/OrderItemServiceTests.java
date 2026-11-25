@@ -80,6 +80,7 @@ class OrderItemServiceTests {
     @Test
     void export(){
         Long orderId = 24L;
+        service.updatePriceByOrderId(orderId);
         List<OrderItemExportVO> allByOrderId = service.findAllByOrderId(orderId);
         // 写入本地文件
         String path = "src/test/resources/export_"
